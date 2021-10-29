@@ -29,8 +29,8 @@
     <Authors>MyJetWallet</Authors>
     <Company>MyJetWallet</Company>
     <Product>MarketingBox</Product>
-    <PackageProjectUrl>https://github.com/MyJetWallet/MarketingBox.Integration.Service</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/MyJetWallet/MarketingBox.Integration.Service</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/MarketingBox/MarketingBox.Integration.Service</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/MarketingBox/MarketingBox.Integration.Service</RepositoryUrl>
   </PropertyGroup>
 
   <PropertyGroup>
