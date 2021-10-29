@@ -26,11 +26,11 @@
       $(TargetsForTfmSpecificBuildOutput);PackReferencedProjectOutputs
     </TargetsForTfmSpecificBuildOutput>
     <PackageId>MarketingBox.Integration.Service.Client</PackageId>
-    <Authors>MyJetWallet</Authors>
-    <Company>MyJetWallet</Company>
+    <Authors>MyJetMarketingBox</Authors>
+    <Company>MyJetMarketingBox</Company>
     <Product>MarketingBox</Product>
-    <PackageProjectUrl>https://github.com/MarketingBox/MarketingBox.Integration.Service</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/MarketingBox/MarketingBox.Integration.Service</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/MyJetMarketingBox/MarketingBox.Integration.Service</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/MyJetMarketingBox/MarketingBox.Integration.Service</RepositoryUrl>
   </PropertyGroup>
 
   <PropertyGroup>
