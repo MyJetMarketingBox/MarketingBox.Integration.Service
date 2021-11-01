@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/aspnet:5.0.1-buster-slim
+FROM mcr.microsoft.com/dotnet/sdk:5.0-alpine
 WORKDIR /app
 COPY . .
 ARG app_compilation_date
