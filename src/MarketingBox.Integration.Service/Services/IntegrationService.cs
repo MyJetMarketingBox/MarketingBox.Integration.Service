@@ -6,6 +6,7 @@ using MarketingBox.Integration.Service.Grpc.Models.Common;
 using MarketingBox.Integration.Service.Grpc.Models.Leads;
 using MarketingBox.Integration.Service.Grpc.Models.Leads.Contracts;
 using MarketingBox.Integration.Service.Storage;
+using MarketingBox.Integration.Service.Utils;
 using Error = MarketingBox.Integration.Service.Grpc.Models.Common.Error;
 using ErrorType = MarketingBox.Integration.Service.Grpc.Models.Common.ErrorType;
 
@@ -43,7 +44,7 @@ namespace MarketingBox.Integration.Service.Services
                             Country = request.Info.Country,
                             FirstName = request.Info.FirstName,
                             Ip = request.Info.Ip,
-                            Language = request.Info.Ip,
+                            Language = LanguageUtils.GetIso2LanguageFromCountryFirstOrDefault(request.Info.Country),
                             LastName = request.Info.LastName,
                             Phone = request.Info.Phone
                         },
@@ -117,7 +118,7 @@ namespace MarketingBox.Integration.Service.Services
                     Country = registrationRequest.Info.Country,
                     FirstName = registrationRequest.Info.FirstName,
                     Ip = registrationRequest.Info.Ip,
-                    Language = registrationRequest.Info.Ip,
+                    Language = registrationRequest.Info.Language,
                     LastName = registrationRequest.Info.LastName,
                     Phone = registrationRequest.Info.Phone
                 }
