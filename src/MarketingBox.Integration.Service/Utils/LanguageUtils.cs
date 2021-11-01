@@ -1,4 +1,5 @@
 ﻿
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -57,8 +58,9 @@ namespace MarketingBox.Integration.Service.Utils
                 if (c.IsNeutralCulture) return false;
                 if (c.LCID == 0x7F) return false; // Ignore Invariant culture
                 var region = new RegionInfo(c.LCID);
-                return region.TwoLetterISORegionName == country;
+                return region.TwoLetterISORegionName.Equals(country, StringComparison.OrdinalIgnoreCase);
             }).Select(c => c.TwoLetterISOLanguageName.ToUpper()).ToList();
+
             return languagesSpoken;
         }
     }
