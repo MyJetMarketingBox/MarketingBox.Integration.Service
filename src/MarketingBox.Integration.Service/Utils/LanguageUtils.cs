@@ -59,12 +59,12 @@ namespace MarketingBox.Integration.Service.Utils
                 {
                     if (c.IsNeutralCulture) return false;
                     if (c.LCID == 0x7F) return false; // Ignore Invariant culture
+                    if (c.LCID == 0x1000) return false; // Ignore culture [pt-Cl] for docker build test
                     var region = new RegionInfo(c.LCID);
                     return region.TwoLetterISORegionName.Equals(country, StringComparison.OrdinalIgnoreCase);
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine($"Debug output {country}  LCID {c.LCID}");
                     return false;
                 }
 
