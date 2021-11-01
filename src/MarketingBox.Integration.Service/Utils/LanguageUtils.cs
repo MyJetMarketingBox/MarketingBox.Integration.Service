@@ -55,10 +55,19 @@ namespace MarketingBox.Integration.Service.Utils
             var allCultures = CultureInfo.GetCultures(CultureTypes.AllCultures);
             var languagesSpoken = allCultures.Where(c =>
             {
-                if (c.IsNeutralCulture) return false;
-                if (c.LCID == 0x7F) return false; // Ignore Invariant culture
-                var region = new RegionInfo(c.LCID);
-                return region.TwoLetterISORegionName.Equals(country, StringComparison.OrdinalIgnoreCase);
+                try
+                {
+                    if (c.IsNeutralCulture) return false;
+                    if (c.LCID == 0x7F) return false; // Ignore Invariant culture
+                    var region = new RegionInfo(c.LCID);
+                    return region.TwoLetterISORegionName.Equals(country, StringComparison.OrdinalIgnoreCase);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"Debug output {country}  LCID {c.LCID}");
+                    return false;
+                }
+
             }).Select(c => c.TwoLetterISOLanguageName.ToUpper()).ToList();
 
             return languagesSpoken;
