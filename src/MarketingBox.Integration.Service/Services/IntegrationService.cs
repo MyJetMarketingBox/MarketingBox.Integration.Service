@@ -2,6 +2,8 @@
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
+using MarketingBox.Integration.Bridge.Client;
+using MarketingBox.Integration.Service.Client;
 using MarketingBox.Integration.Service.Grpc.Models.Common;
 using MarketingBox.Integration.Service.Grpc.Models.Leads;
 using MarketingBox.Integration.Service.Grpc.Models.Leads.Contracts;
@@ -16,17 +18,17 @@ namespace MarketingBox.Integration.Service.Services
     public class IntegrationService : IIntegrationService
     {
         private readonly ILogger<IntegrationService> _logger;
-        private readonly IBridgeService _bridgeService;
+        private readonly BridgeServiceWrapper _bridgeServiceWrapper;
         private readonly IDepositUpdateStorage _depositUpdateStorage;
 
 
         public IntegrationService(ILogger<IntegrationService> logger,
-            IBridgeService bridgeService,
+            BridgeServiceWrapper bridgeServiceWrapper,
             IDepositUpdateStorage depositUpdateStorage
             )
         {
             _logger = logger;
-            _bridgeService = bridgeService;
+            _bridgeServiceWrapper = bridgeServiceWrapper;
             _depositUpdateStorage = depositUpdateStorage;
         }
 
@@ -35,7 +37,7 @@ namespace MarketingBox.Integration.Service.Services
             _logger.LogInformation("Creating new RegistrationLeadInfo {@context}", request); 
             try
             {
-                var customerInfo = await _bridgeService.RegisterCustomerAsync(new RegistrationBridgeRequest()
+                 var registration =  new RegistrationBridgeRequest()
                 {
                     Info = new RegistrationLeadInfo()
                         { 
@@ -63,9 +65,11 @@ namespace MarketingBox.Integration.Service.Services
                         Sub9 = request.AdditionalInfo.Sub9,
                         Sub10 = request.AdditionalInfo.Sub10,
                     },
-                });
+                };
 
-                
+                 var customerInfo =
+                     await _bridgeServiceWrapper.TryGetService(request.BrandName).RegisterCustomerAsync(registration);
+
                 //TODO: Move deposit generator to another service
                 if (customerInfo.ResultCode == ResultCode.CompletedSuccessfully)
                 {

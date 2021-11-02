@@ -33,6 +33,7 @@
   <ItemGroup>
     <ProjectReference Include="..\MarketingBox.Integration.Bridge.Client\MarketingBox.Integration.Bridge.Client.csproj" />
     <ProjectReference Include="..\MarketingBox.Integration.Postgres\MarketingBox.Integration.Postgres.csproj" />
+    <ProjectReference Include="..\MarketingBox.Integration.Service.Client\MarketingBox.Integration.Service.Client.csproj" />
     <ProjectReference Include="..\MarketingBox.Integration.Service.Domain\MarketingBox.Integration.Service.Domain.csproj" />
     <ProjectReference Include="..\MarketingBox.Integration.Service.Grpc\MarketingBox.Integration.Service.Grpc.csproj" />
     <ProjectReference Include="..\MarketingBox.Integration.Service.MyNoSql\MarketingBox.Integration.Service.MyNoSql.csproj" />

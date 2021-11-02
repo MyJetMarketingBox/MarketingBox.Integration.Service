@@ -1,5 +1,4 @@
 ﻿using JetBrains.Annotations;
-using MarketingBox.Integration.Service.Grpc;
 using MyJetWallet.Sdk.Grpc;
 
 namespace MarketingBox.Integration.Bridge.Client

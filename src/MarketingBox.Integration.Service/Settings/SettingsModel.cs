@@ -23,5 +23,14 @@ namespace MarketingBox.Integration.Service.Settings
 
         [YamlProperty("MarketingBoxIntegrationService.IntegrationMonfexBridgeUrl")]
         public string IntegrationMonfexBridgeUrl { get; set; }
+
+        [YamlProperty("MarketingBoxIntegrationService.IntegrationHandelproBridgeUrl")]
+        public string IntegrationHandelproBridgeUrl { get; set; }
+
+
+        [YamlProperty("MarketingBoxIntegrationService.IntegrationAllianzmarketBridgeUrl")]
+        public string IntegrationAllianzmarketBridgeUrl { get; set; }
+
     }
+
 }
