@@ -1,4 +1,5 @@
-﻿using MyJetWallet.Sdk.Service;
+﻿using System.Collections.Generic;
+using MyJetWallet.Sdk.Service;
 using MyYamlParser;
 
 namespace MarketingBox.Integration.Service.Settings
@@ -20,17 +21,23 @@ namespace MarketingBox.Integration.Service.Settings
         [YamlProperty("MarketingBoxIntegrationService.RegistrationServiceUrl")]
         public string RegistrationServiceUrl { get; set; }
 
+        [YamlProperty("MarketingBoxIntegrationService.Bridges")]
+        public Dictionary<string, string> Bridges { get; set; }
 
-        [YamlProperty("MarketingBoxIntegrationService.IntegrationMonfexBridgeUrl")]
-        public string IntegrationMonfexBridgeUrl { get; set; }
-
-        [YamlProperty("MarketingBoxIntegrationService.IntegrationHandelproBridgeUrl")]
-        public string IntegrationHandelproBridgeUrl { get; set; }
-
-
-        [YamlProperty("MarketingBoxIntegrationService.IntegrationAllianzmarketBridgeUrl")]
-        public string IntegrationAllianzmarketBridgeUrl { get; set; }
-
+        public List<BridgeSettings> GetBridges()
+        {
+            var bridgesList = new List<BridgeSettings>();
+            foreach (var bridgeSetting in Bridges)
+            {
+                var items = bridgeSetting.Value.Split("@");
+                bridgesList.Add(new BridgeSettings()
+                            {
+                                Tenant = items[0],
+                                Brand = items[1],
+                                Url = items[2]
+                            });
+            }
+            return bridgesList;
+        }
     }
-
 }
