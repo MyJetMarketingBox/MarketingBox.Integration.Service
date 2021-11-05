@@ -48,8 +48,8 @@ namespace MarketingBox.Integration.Service.Services
                     {
                         CustomerId = message.CustomerId,
                         Email = message.Email,
-                        BrandName = message.BrandName,
-                        BrandId = message.BrandId,
+                        BrandName = message.IntegrationName,
+                        BrandId = message.IntegrationId,
                         TenantId = message.TenantId,
                         CreatedAt = DateTime.UtcNow,
                     });

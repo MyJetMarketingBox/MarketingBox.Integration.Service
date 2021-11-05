@@ -43,11 +43,11 @@ namespace TestApp
 
             //var leadCreated = (await  client.CreateAsync(request)).RegistrationBrandInfo;
 
-            //Console.WriteLine(leadCreated.LeadId);
+            //Console.WriteLine(leadCreated.RegistrationId);
 
             //var partnerUpdated = (await client.UpdateAsync(new LeadUpdateRequest()
             //{
-            //    LeadId = leadCreated.LeadId,
+            //    RegistrationId = leadCreated.RegistrationId,
             //    TenantId = leadCreated.TenantId,
             //    Info = request.Info,
             //    Sequence = 1
@@ -55,12 +55,12 @@ namespace TestApp
 
             //await client.DeleteAsync(new LeadDeleteRequest()
             //{
-            //    LeadId = partnerUpdated.LeadId,
+            //    RegistrationId = partnerUpdated.RegistrationId,
             //});
 
             //var shouldBeNull =await client.GetAsync(new LeadGetRequest()
             //{
-            //    LeadId = partnerUpdated.LeadId,
+            //    RegistrationId = partnerUpdated.RegistrationId,
             //});
 
             Console.WriteLine("End");

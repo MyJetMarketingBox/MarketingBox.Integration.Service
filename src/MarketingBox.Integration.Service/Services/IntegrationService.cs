@@ -68,19 +68,19 @@ namespace MarketingBox.Integration.Service.Services
                 };
 
                  var customerInfo =
-                     await _bridgeServiceWrapper.TryGetService(request.BrandName).RegisterCustomerAsync(registration);
+                     await _bridgeServiceWrapper.TryGetService(request.IntegrationName).RegisterCustomerAsync(registration);
 
                 //TODO: Move deposit generator to another service
                 if (customerInfo.ResultCode == ResultCode.CompletedSuccessfully)
                 {
                     _depositUpdateStorage.Add(request.LeadUniqueId, new DepositUpdateMessage()
                     {
-                        BrandName = request.BrandName,
+                        IntegrationName = request.IntegrationName,
                         CustomerId = customerInfo.RegistrationInfo.CustomerId,
                         Email = request.Info.Email,
                         TenantId = request.TenantId,
                         Sequence = 0,
-                        BrandId = request.BrandId,
+                        IntegrationId = request.IntegrationId,
                     });
                 }
 

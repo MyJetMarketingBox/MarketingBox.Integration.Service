@@ -9,7 +9,7 @@ namespace MarketingBox.Integration.Service.Grpc.Models.Leads.Contracts
         public string TenantId { get; set; }
 
         [DataMember(Order = 2)]
-        public long LeadId { get; set; }
+        public long RegistrationId { get; set; }
 
         [DataMember(Order = 3)]
         public string LeadUniqueId { get; set; }
@@ -21,9 +21,9 @@ namespace MarketingBox.Integration.Service.Grpc.Models.Leads.Contracts
         public RegistrationLeadAdditionalInfo AdditionalInfo { get; set; }
 
         [DataMember(Order = 6)]
-        public string BrandName { get; set; }
+        public string IntegrationName { get; set; }
 
         [DataMember(Order = 7)]
-        public long BrandId { get; set; }
+        public long IntegrationId { get; set; }
     }
 }

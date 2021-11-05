@@ -17,13 +17,13 @@ namespace MarketingBox.Integration.Service.Storage
     public class DepositUpdateMessage
     {
         public string TenantId { get; set; }
-        public long LeadId { get; set; }
-        public string BrandName { get; set; }
+        public long RegistrationId { get; set; }
+        public string IntegrationName { get; set; }
         public long Sequence { get; set; }
-        public long BrandId { get; set; }
+        public long IntegrationId { get; set; }
         public long AffiliateId { get; set; }
+        public long BrandId { get; set; }
         public long CampaignId { get; set; }
-        public long BoxId { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime RegisterDate { get; set; }
         public string CustomerId { get; set; }
