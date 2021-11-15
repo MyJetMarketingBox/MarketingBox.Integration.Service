@@ -1,5 +1,4 @@
-﻿using System.Reflection.Metadata;
-using Autofac;
+﻿using Autofac;
 using MarketingBox.Integration.Bridge.Client;
 using MarketingBox.Integration.Service.Services;
 using MarketingBox.Integration.Service.Storage;
