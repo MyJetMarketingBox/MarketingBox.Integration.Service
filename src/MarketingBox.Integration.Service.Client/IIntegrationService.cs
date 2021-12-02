@@ -1,6 +1,7 @@
-﻿using System.ServiceModel;
+﻿using System;
+using System.ServiceModel;
 using System.Threading.Tasks;
-using MarketingBox.Integration.Service.Grpc.Models.Leads.Contracts;
+using MarketingBox.Integration.Service.Grpc.Models.Registrations.Contracts.Integration;
 
 namespace MarketingBox.Integration.Service.Client
 {
@@ -8,6 +9,6 @@ namespace MarketingBox.Integration.Service.Client
     public interface IIntegrationService
     {
         [OperationContract]
-        Task<RegistrationResponse> RegisterLeadAsync(RegistrationRequest request);
+        Task<RegistrationResponse> SendRegisterationAsync(RegistrationRequest request);
     }
 }

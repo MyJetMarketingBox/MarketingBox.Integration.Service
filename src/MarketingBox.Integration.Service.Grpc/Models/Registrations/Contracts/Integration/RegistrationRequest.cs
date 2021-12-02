@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace MarketingBox.Integration.Service.Grpc.Models.Leads.Contracts
+namespace MarketingBox.Integration.Service.Grpc.Models.Registrations.Contracts.Integration
 {
     [DataContract]
     public class RegistrationRequest
@@ -12,13 +12,13 @@ namespace MarketingBox.Integration.Service.Grpc.Models.Leads.Contracts
         public long RegistrationId { get; set; }
 
         [DataMember(Order = 3)]
-        public string LeadUniqueId { get; set; }
+        public string RegistrationUniqueId { get; set; }
 
         [DataMember(Order = 4)]
-        public RegistrationLeadInfo Info { get; set; }
+        public RegistrationInfo Info { get; set; }
 
         [DataMember(Order = 5)]
-        public RegistrationLeadAdditionalInfo AdditionalInfo { get; set; }
+        public RegistrationAdditionalInfo AdditionalInfo { get; set; }
 
         [DataMember(Order = 6)]
         public string IntegrationName { get; set; }

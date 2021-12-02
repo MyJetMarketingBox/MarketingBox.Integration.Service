@@ -1,10 +1,10 @@
 ﻿using System.Runtime.Serialization;
 using MarketingBox.Integration.Service.Grpc.Models.Common;
 
-namespace MarketingBox.Integration.Service.Grpc.Models.Leads.Contracts
+namespace MarketingBox.Integration.Service.Grpc.Models.Registrations.Contracts.Bridge
 {
     [DataContract]
-    public class RegistrationBridgeResponse
+    public class RegistrationResponse
     {
         [DataMember(Order = 1)]
         public ResultCode ResultCode { get; set; }
@@ -13,7 +13,7 @@ namespace MarketingBox.Integration.Service.Grpc.Models.Leads.Contracts
         public string ResultMessage { get; set; }
 
         [DataMember(Order = 3)]
-        public RegisteredLeadInfo RegistrationInfo { get; set; }
+        public CustomerInfo CustomerInfo { get; set; }
 
         [DataMember(Order = 100)]
         public Error Error { get; set; }

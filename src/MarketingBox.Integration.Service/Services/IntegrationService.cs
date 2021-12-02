@@ -1,14 +1,12 @@
-﻿using MarketingBox.Integration.Service.Grpc;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
 using MarketingBox.Integration.Bridge.Client;
 using MarketingBox.Integration.Service.Client;
 using MarketingBox.Integration.Service.Grpc.Models.Common;
-using MarketingBox.Integration.Service.Grpc.Models.Leads;
-using MarketingBox.Integration.Service.Grpc.Models.Leads.Contracts;
 using MarketingBox.Integration.Service.Storage;
 using MarketingBox.Integration.Service.Utils;
+using MarketingBox.Integration.Service.Grpc.Models.Registrations;
 using Error = MarketingBox.Integration.Service.Grpc.Models.Common.Error;
 using ErrorType = MarketingBox.Integration.Service.Grpc.Models.Common.ErrorType;
 
@@ -32,14 +30,14 @@ namespace MarketingBox.Integration.Service.Services
             _depositUpdateStorage = depositUpdateStorage;
         }
 
-        public async Task<RegistrationResponse> RegisterLeadAsync(RegistrationRequest request)
+        public async Task<Grpc.Models.Registrations.Contracts.Integration.RegistrationResponse> SendRegisterationAsync(Grpc.Models.Registrations.Contracts.Integration.RegistrationRequest request)
         {
-            _logger.LogInformation("Creating new RegistrationLeadInfo {@context}", request); 
+            _logger.LogInformation("Creating new RegistrationInfo {@context}", request); 
             try
             {
-                 var registration =  new RegistrationBridgeRequest()
+                 var registration =  new Grpc.Models.Registrations.Contracts.Bridge.RegistrationRequest()
                 {
-                    Info = new RegistrationLeadInfo()
+                    Info = new RegistrationInfo()
                         { 
                             Email = request.Info.Email,
                             Password = request.Info.Password,
@@ -50,7 +48,7 @@ namespace MarketingBox.Integration.Service.Services
                             LastName = request.Info.LastName,
                             Phone = request.Info.Phone
                         },
-                    AdditionalInfo = new RegistrationLeadAdditionalInfo()
+                    AdditionalInfo = new RegistrationAdditionalInfo()
                     {
                         So = request.AdditionalInfo.So,
                         Sub = request.AdditionalInfo.Sub,
@@ -68,15 +66,15 @@ namespace MarketingBox.Integration.Service.Services
                 };
 
                  var customerInfo =
-                     await _bridgeServiceWrapper.TryGetService(request.IntegrationName).RegisterCustomerAsync(registration);
+                     await _bridgeServiceWrapper.TryGetService(request.IntegrationName).SendRegistrationAsync(registration);
 
                 //TODO: Move deposit generator to another service
                 if (customerInfo.ResultCode == ResultCode.CompletedSuccessfully)
                 {
-                    _depositUpdateStorage.Add(request.LeadUniqueId, new DepositUpdateMessage()
+                    _depositUpdateStorage.Add(request.RegistrationUniqueId, new DepositUpdateMessage()
                     {
                         IntegrationName = request.IntegrationName,
-                        CustomerId = customerInfo.RegistrationInfo.CustomerId,
+                        CustomerId = customerInfo.CustomerInfo.CustomerId,
                         Email = request.Info.Email,
                         TenantId = request.TenantId,
                         Sequence = 0,
@@ -84,7 +82,7 @@ namespace MarketingBox.Integration.Service.Services
                     });
                 }
 
-                _logger.LogInformation("Created RegistrationLeadInfo {@context}", customerInfo);
+                _logger.LogInformation("Created RegistrationInfo {@context}", customerInfo);
 
                 return MapToGrpc(customerInfo, request);
             }
@@ -92,21 +90,22 @@ namespace MarketingBox.Integration.Service.Services
             {
                 _logger.LogError(e, "Error creating lead {@context}", request);
 
-                return new RegistrationResponse() { Error = new Error() { Message = "Internal error", Type = ErrorType.Unknown } };
+                return new Grpc.Models.Registrations.Contracts.Integration.RegistrationResponse() { Error = new Error() { Message = "Internal error", Type = ErrorType.Unknown } };
             }
         }
 
 
-        private static RegistrationResponse MapToGrpc(RegistrationBridgeResponse brandInfo,
-            RegistrationRequest registrationRequest)
+        private static Grpc.Models.Registrations.Contracts.Integration.RegistrationResponse MapToGrpc(
+            Grpc.Models.Registrations.Contracts.Bridge.RegistrationResponse brandInfo,
+            Grpc.Models.Registrations.Contracts.Integration.RegistrationRequest registrationRequest)
         {
             if (brandInfo.ResultCode == ResultCode.CompletedSuccessfully)
             {
-                return Successfully(new RegisteredLeadInfo()
+                return Successfully(new CustomerInfo()
                 {
-                    CustomerId = brandInfo.RegistrationInfo.CustomerId,
-                    LoginUrl = brandInfo.RegistrationInfo.LoginUrl,
-                    Token = brandInfo.RegistrationInfo.Token,
+                    CustomerId = brandInfo.CustomerInfo.CustomerId,
+                    LoginUrl = brandInfo.CustomerInfo.LoginUrl,
+                    Token = brandInfo.CustomerInfo.Token,
                 });
             }
 
@@ -115,7 +114,7 @@ namespace MarketingBox.Integration.Service.Services
                     Message = brandInfo.ResultMessage,
                     Type = brandInfo.Error.Type
                 }, 
-                new RegistrationLeadInfo()
+                new RegistrationInfo()
                 {
                     Email = registrationRequest.Info.Email,
                     Password = registrationRequest.Info.Password,
@@ -129,19 +128,19 @@ namespace MarketingBox.Integration.Service.Services
             );
         }
 
-        private static RegistrationResponse Successfully(RegisteredLeadInfo brandRegisteredLeadInfo)
+        private static Grpc.Models.Registrations.Contracts.Integration.RegistrationResponse Successfully(CustomerInfo brandRegisteredLeadInfo)
         {
-            return new RegistrationResponse()
+            return new Grpc.Models.Registrations.Contracts.Integration.RegistrationResponse()
             {
                 Status = ResultCode.CompletedSuccessfully,
                 Message = brandRegisteredLeadInfo.LoginUrl,
-                RegisteredLeadInfo = brandRegisteredLeadInfo
+                Customer = brandRegisteredLeadInfo
             };
         }
 
-        private static RegistrationResponse Failed(Error error, RegistrationLeadInfo originalData)
+        private static Grpc.Models.Registrations.Contracts.Integration.RegistrationResponse Failed(Error error, RegistrationInfo originalData)
         {
-            return new RegistrationResponse()
+            return new Grpc.Models.Registrations.Contracts.Integration.RegistrationResponse()
             {
                 Status = ResultCode.Failed,
                 Message = error.Message,
@@ -150,15 +149,21 @@ namespace MarketingBox.Integration.Service.Services
             };
         }
 
-        private static RegistrationResponse RequiredAuthentication(Error error, RegistrationLeadInfo originalData)
+        private static Grpc.Models.Registrations.Contracts.Integration.RegistrationResponse RequiredAuthentication(
+            Error error, RegistrationInfo originalData)
         {
-            return new RegistrationResponse()
+            return new Grpc.Models.Registrations.Contracts.Integration.RegistrationResponse()
             {
                 Status = ResultCode.RequiredAuthentication,
                 Message = error.Message,
                 Error = error,
                 OriginalData = originalData
             };
+        }
+
+        public Task<Grpc.Models.Registrations.Contracts.Integration.RegistrationResponse> GetRegistrationPerPeriodAsync(Grpc.Models.Registrations.Contracts.Integration.RegistrationRequest request)
+        {
+            throw new NotImplementedException();
         }
     }
 }

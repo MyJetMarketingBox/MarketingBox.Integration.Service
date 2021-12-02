@@ -1,10 +1,10 @@
 ﻿using System.Runtime.Serialization;
 using Destructurama.Attributed;
 
-namespace MarketingBox.Integration.Service.Grpc.Models.Leads
+namespace MarketingBox.Integration.Service.Grpc.Models.Registrations
 {
     [DataContract]
-    public class RegistrationLeadInfo
+    public class RegistrationInfo
     {
         [DataMember(Order = 1)]
         [LogMasked(PreserveLength = true, ShowFirst = 2, ShowLast = 2)]
@@ -25,7 +25,7 @@ namespace MarketingBox.Integration.Service.Grpc.Models.Leads
         [DataMember(Order = 5)]
         [LogMasked(PreserveLength = true, ShowFirst = 2, ShowLast = 2)]
         public string Phone { get; set; }
-        
+
         [DataMember(Order = 6)]
         [LogMasked(PreserveLength = true, ShowFirst = 2, ShowLast = 2)]
         public string Ip { get; set; }

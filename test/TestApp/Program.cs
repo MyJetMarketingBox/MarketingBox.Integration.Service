@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using MarketingBox.Integration.Service.Client;
-using MarketingBox.Integration.Service.Grpc.Models.Leads;
-using MarketingBox.Integration.Service.Grpc.Models.Leads.Contracts;
 using ProtoBuf.Grpc.Client;
 
 namespace TestApp
@@ -19,17 +17,18 @@ namespace TestApp
             var factory = new IntegrationServiceClientFactory("http://localhost:12347");
             var client = factory.GetIntegrationService();
 
-            var check = await client.RegisterLeadAsync(new RegistrationRequest()
+            var check = await client.SendRegisterationAsync(new MarketingBox.Integration.Service.Grpc.Models.Registrations.Contracts.Integration.RegistrationRequest()
             {
                 TenantId = "test-tenant-id",
+                
             });
 
-            var testTenant = "Test-Tenant";
-            var request = new RegistrationRequest()
-            {
-                TenantId = testTenant,
-            };
-            //request.Info = new RegistrationLeadInfo()
+            //var testTenant = "Test-Tenant";
+            //var request = new MarketingBox.Integration.Service.Grpc.Models.Registrations.Contracts.Bridge.RegistrationRequest()
+            //{
+            //    TenantId = testTenant,
+            //};
+            //request.Info = new RegistrationInfo()
             //{
             //    //Currency = Currency.CHF,
             //    //Email = "email@email.com",
@@ -51,7 +50,7 @@ namespace TestApp
             //    TenantId = leadCreated.TenantId,
             //    Info = request.Info,
             //    Sequence = 1
-            //})).RegistrationLeadInfo;
+            //})).RegistrationInfo;
 
             //await client.DeleteAsync(new LeadDeleteRequest()
             //{

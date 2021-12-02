@@ -1,9 +1,9 @@
 ﻿using System.Runtime.Serialization;
 
-namespace MarketingBox.Integration.Service.Grpc.Models.Leads
+namespace MarketingBox.Integration.Service.Grpc.Models.Registrations
 {
     [DataContract]
-    public class RegistrationLeadAdditionalInfo
+    public class RegistrationAdditionalInfo
     {
         [DataMember(Order = 1)]
         public string So { get; set; }

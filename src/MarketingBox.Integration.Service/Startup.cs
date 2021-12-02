@@ -36,7 +36,7 @@ namespace MarketingBox.Integration.Service
             
             DatabaseContext.LoggerFactory = null;
 
-            services.AddMyTelemetry("SP-", Program.Settings.ZipkinUrl);
+            services.AddMyTelemetry("MB-", Program.Settings.ZipkinUrl);
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
