@@ -4,10 +4,10 @@ using System.Runtime.Serialization;
 
 namespace MarketingBox.Integration.Service.Grpc.Models.Registrations.Contracts.Bridge
 {
-    public class ReportingResponse
+    public class RegistrationsReportingResponse
     {
         [DataMember(Order = 1)]
-        public IReadOnlyCollection<ReportInfo> Info { get; set; }
+        public IReadOnlyCollection<RegistrationReporting> Items { get; set; }
 
         [DataMember(Order = 100)]
         public Error Error { get; set; }

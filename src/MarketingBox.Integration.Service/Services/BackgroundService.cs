@@ -10,6 +10,8 @@ namespace MarketingBox.Integration.Service.Services
 {
     public class BackgroundService
     {
+        private const int TimerSpan10Sec = 10;
+        private const int TimerSpan30Sec = 30;
         private readonly MyTaskTimer _operationsTimer;
         private readonly ILogger<BackgroundService> _logger;
         private readonly IDepositUpdateStorage _depositUpdateStorage;
@@ -22,7 +24,7 @@ namespace MarketingBox.Integration.Service.Services
             _logger = logger;
             _depositUpdateStorage = depositUpdateStorage;
             _depositRegistrationService = depositRegistrationService;
-            _operationsTimer = new MyTaskTimer(nameof(BackgroundService), TimeSpan.FromSeconds(10), logger, Process);
+            _operationsTimer = new MyTaskTimer(nameof(BackgroundService), TimeSpan.FromSeconds(TimerSpan30Sec), logger, Process);
 
         }
         public void Start()

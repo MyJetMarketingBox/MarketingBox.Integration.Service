@@ -11,6 +11,9 @@ namespace MarketingBox.Integration.Bridge.Client
         Task<RegistrationResponse> SendRegistrationAsync(RegistrationRequest request);
         
         [OperationContract]
-        Task<ReportingResponse> GetRegistrationsPerPeriodAsync(ReportingRequest request);
+        Task<RegistrationsReportingResponse> GetRegistrationsPerPeriodAsync(ReportingRequest request);
+
+        [OperationContract]
+        Task<DepositorsReportingResponse> GetDepositorsPerPeriodAsync(ReportingRequest request);
     }
 }
