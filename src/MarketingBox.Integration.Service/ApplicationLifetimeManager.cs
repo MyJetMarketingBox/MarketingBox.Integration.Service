@@ -2,19 +2,19 @@
 using Microsoft.Extensions.Logging;
 using MyJetWallet.Sdk.Service;
 
-using BackgroundService = MarketingBox.Integration.Service.Services.BackgroundService;
+using DepositorsBackgroundService = MarketingBox.Integration.Service.Services.DepositorsBackgroundService;
 
 namespace MarketingBox.Integration.Service
 {
     public class ApplicationLifetimeManager : ApplicationLifetimeManagerBase
     {
         private readonly ILogger<ApplicationLifetimeManager> _logger;
-        private readonly BackgroundService _myBackgroundService;
+        private readonly DepositorsBackgroundService _myBackgroundService;
 
         public ApplicationLifetimeManager(
             IHostApplicationLifetime appLifetime, 
             ILogger<ApplicationLifetimeManager> logger,
-            BackgroundService myBackgroundService)
+            DepositorsBackgroundService myBackgroundService)
             : base(appLifetime)
         {
             _logger = logger;

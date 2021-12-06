@@ -12,8 +12,10 @@ namespace MarketingBox.Integration.Service.Modules
         {
             builder.RegisterInstance<BridgeServiceWrapper>(new BridgeServiceWrapper(GetBridges()));
             builder.RegisterType<DepositUpdateStorage>().As<IDepositUpdateStorage>().SingleInstance();
-            builder.RegisterType<BackgroundService>().SingleInstance().AutoActivate().AsSelf();
             builder.RegisterRegistrationServiceClient(Program.Settings.RegistrationServiceUrl);
+            builder.RegisterInstance<BridgeStorage>(new BridgeStorage(GetBridges()));
+            //builder.RegisterType<BridgeStorage>(new BridgeStorage(GetBridges())).As<IDepositUpdateStorage>().SingleInstance();
+            builder.RegisterType<DepositorsBackgroundService>().SingleInstance().AutoActivate().AsSelf();
         }
 
         private static (string, IBridgeService)[] GetBridges()
