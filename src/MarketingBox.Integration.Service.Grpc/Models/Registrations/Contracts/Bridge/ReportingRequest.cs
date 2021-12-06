@@ -3,6 +3,7 @@ using System.Runtime.Serialization;
 
 namespace MarketingBox.Integration.Service.Grpc.Models.Registrations.Contracts.Bridge
 {
+    [DataContract]
     public class ReportingRequest
     {
         [DataMember(Order = 1)]
@@ -16,7 +17,6 @@ namespace MarketingBox.Integration.Service.Grpc.Models.Registrations.Contracts.B
 
         [DataMember(Order = 4)]
         public int PageIndex { get; set; }
-
 
         [DataMember(Order = 5)]
         public int PageCount { get; set; }

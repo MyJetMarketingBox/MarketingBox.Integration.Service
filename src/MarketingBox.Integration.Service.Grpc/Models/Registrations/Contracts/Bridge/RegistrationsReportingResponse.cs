@@ -4,6 +4,7 @@ using System.Runtime.Serialization;
 
 namespace MarketingBox.Integration.Service.Grpc.Models.Registrations.Contracts.Bridge
 {
+    [DataContract]
     public class RegistrationsReportingResponse
     {
         [DataMember(Order = 1)]
