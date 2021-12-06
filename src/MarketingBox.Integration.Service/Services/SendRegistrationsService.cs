@@ -13,21 +13,23 @@ using ErrorType = MarketingBox.Integration.Service.Grpc.Models.Common.ErrorType;
 
 namespace MarketingBox.Integration.Service.Services
 {
-    public class IntegrationService : IIntegrationService
+    public class SendRegistrationsService : IIntegrationService
     {
-        private readonly ILogger<IntegrationService> _logger;
+        private readonly ILogger<SendRegistrationsService> _logger;
         private readonly BridgeServiceWrapper _bridgeServiceWrapper;
         private readonly IDepositUpdateStorage _depositUpdateStorage;
+        private readonly BridgeStorage _bridgeStorage;
 
 
-        public IntegrationService(ILogger<IntegrationService> logger,
+        public SendRegistrationsService(ILogger<SendRegistrationsService> logger,
             BridgeServiceWrapper bridgeServiceWrapper,
-            IDepositUpdateStorage depositUpdateStorage
-            )
+            IDepositUpdateStorage depositUpdateStorage,
+            BridgeStorage bridgeStorage)
         {
             _logger = logger;
             _bridgeServiceWrapper = bridgeServiceWrapper;
             _depositUpdateStorage = depositUpdateStorage;
+            _bridgeStorage = bridgeStorage;
         }
 
         public async Task<Grpc.Models.Registrations.Contracts.Integration.RegistrationResponse> SendRegisterationAsync(Grpc.Models.Registrations.Contracts.Integration.RegistrationRequest request)
@@ -63,10 +65,20 @@ namespace MarketingBox.Integration.Service.Services
                         Sub9 = request.AdditionalInfo.Sub9,
                         Sub10 = request.AdditionalInfo.Sub10,
                     },
-                };
+                 };
 
-                 var customerInfo =
-                     await _bridgeServiceWrapper.TryGetService(request.IntegrationName).SendRegistrationAsync(registration);
+                var customerInfo =
+                    await _bridgeServiceWrapper.TryGetService(request.IntegrationName).SendRegistrationAsync(registration);
+
+                var bridges = _bridgeStorage.GetAll();
+                foreach (var bridge in bridges)
+                {
+                    if (bridge.Key.Equals(request.IntegrationName))
+                    {
+                        var customer =
+                            await bridge.Value.SendRegistrationAsync(registration);
+                    }
+                }
 
                 //TODO: Move deposit generator to another service
                 if (customerInfo.ResultCode == ResultCode.CompletedSuccessfully)

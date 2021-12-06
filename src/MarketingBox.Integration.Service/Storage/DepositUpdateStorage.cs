@@ -63,6 +63,5 @@ namespace MarketingBox.Integration.Service.Storage
         {
             _data.TryRemove(requestLeadUniqueId, out _);
         }
-
     }
 }

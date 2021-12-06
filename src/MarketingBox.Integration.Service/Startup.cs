@@ -56,7 +56,7 @@ namespace MarketingBox.Integration.Service
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapGrpcSchema<IntegrationService, IIntegrationService>();
+                endpoints.MapGrpcSchema<SendRegistrationsService, IIntegrationService>();
 
                 endpoints.MapGrpcSchemaRegistry();
 
