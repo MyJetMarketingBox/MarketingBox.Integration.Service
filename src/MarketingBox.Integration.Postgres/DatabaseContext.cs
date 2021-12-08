@@ -1,4 +1,4 @@
-﻿using MarketingBox.Integration.Postgres.Entities.Lead;
+﻿using MarketingBox.Integration.Postgres.Entities;
 using Microsoft.EntityFrameworkCore;
 using MyJetWallet.Sdk.Postgres;
 using Newtonsoft.Json;
@@ -12,10 +12,9 @@ namespace MarketingBox.Integration.Postgres
 
         public const string Schema = "integration-service";
 
-        private const string LeadTableName = "brandintegration";
+        private const string RegistrationsLogTableName = "registrationslogs";
 
-        public DbSet<LeadEntity> Leads { get; set; }
-
+        public DbSet<RegistrationLogEntity> RegistrationsLog { get; set; }
 
         public DatabaseContext(DbContextOptions options) : base(options)
         {
@@ -33,18 +32,17 @@ namespace MarketingBox.Integration.Postgres
         {
             modelBuilder.HasDefaultSchema(Schema);
 
-            SetPartnerEntity(modelBuilder);
+            SetRegistrationLogEntity(modelBuilder);
 
             base.OnModelCreating(modelBuilder);
         }
 
-        private void SetPartnerEntity(ModelBuilder modelBuilder)
+        private void SetRegistrationLogEntity(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<LeadEntity>().ToTable(LeadTableName);
-            modelBuilder.Entity<LeadEntity>().HasKey(e => e.LeadId);
-            modelBuilder.Entity<LeadEntity>().OwnsOne(x => x.BrandInfo);   //modelBuilder.Entity<LeadEntity>().Ignore(x => x.GeneralInfo);
-            modelBuilder.Entity<LeadEntity>().OwnsOne(x => x.AdditionalInfo);
-            modelBuilder.Entity<LeadEntity>().HasIndex(e => new {e.TenantId, e.LeadId});
+            modelBuilder.Entity<RegistrationLogEntity>().ToTable(RegistrationsLogTableName);
+            modelBuilder.Entity<RegistrationLogEntity>().HasKey(e => e.RegistrationId);
+            modelBuilder.Entity<RegistrationLogEntity>().HasIndex(e => new {e.TenantId, e.RegistrationId});
+            modelBuilder.Entity<RegistrationLogEntity>().HasIndex(e => new { e.TenantId, e.IntegrationId, e.CustomerId });
         }
             
         public override void Dispose()

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MarketingBox.Integration.Service.Domain.Registrations;
+using System;
 using System.Runtime.Serialization;
 
 namespace MarketingBox.Integration.Service.Grpc.Models.Registrations
@@ -14,7 +15,7 @@ namespace MarketingBox.Integration.Service.Grpc.Models.Registrations
         public string CustomerEmail { get; set; }
 
         [DataMember(Order = 3)]
-        public string CrmStatus  { get; set; }
+        public CrmStatus Crm  { get; set; }
 
         [DataMember(Order = 4)]
         public DateTime CreatedAt { get; set; }

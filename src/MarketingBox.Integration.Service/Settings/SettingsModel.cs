@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using MyJetWallet.Sdk.Service;
 using MyYamlParser;
 
@@ -12,9 +13,6 @@ namespace MarketingBox.Integration.Service.Settings
         [YamlProperty("MarketingBoxIntegrationService.ZipkinUrl")]
         public string ZipkinUrl { get; set; }
 
-        [YamlProperty("MarketingBoxIntegrationService.ElkLogs")]
-        public LogElkSettings ElkLogs { get; set; }
-
         [YamlProperty("MarketingBoxIntegrationService.MyNoSqlWriterUrl")]
         public string MyNoSqlWriterUrl { get; set; }
 
@@ -24,6 +22,9 @@ namespace MarketingBox.Integration.Service.Settings
         [YamlProperty("MarketingBoxIntegrationService.Bridges")]
         public Dictionary<string, string> Bridges { get; set; }
 
+        [YamlProperty("MarketingBoxIntegrationService.PostgresConnectionString")]
+        public string PostgresConnectionString { get; set; }
+
         public List<BridgeSettings> GetBridges()
         {
             var bridgesList = new List<BridgeSettings>();
@@ -31,11 +32,12 @@ namespace MarketingBox.Integration.Service.Settings
             {
                 var items = bridgeSetting.Value.Split("@");
                 bridgesList.Add(new BridgeSettings()
-                            {
-                                Tenant = items[0],
-                                Brand = items[1],
-                                Url = items[2]
-                            });
+                {
+                    TenantId = items[0],
+                    IntegrationName = items[1],
+                    IntegrationId = Convert.ToInt64(items[2]),
+                    Url = items[3]
+                });
             }
             return bridgesList;
         }
