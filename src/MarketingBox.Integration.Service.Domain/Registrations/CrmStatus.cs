@@ -11,6 +11,8 @@
         NotValid,
         NotInterested,
         Transfer,
-        FollowUp
+        FollowUp,
+        ConversionRenew,
+        Unknown
     }
 }
