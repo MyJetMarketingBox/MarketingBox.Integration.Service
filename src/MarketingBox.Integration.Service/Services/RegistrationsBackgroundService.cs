@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using MarketingBox.Integration.Service.Domain.Extensions;
 using MarketingBox.Integration.Service.Domain.Repositories;
 using MarketingBox.Integration.Service.Domain.Utils;
 using MarketingBox.Integration.Service.Grpc.Models.Registrations;
@@ -21,13 +22,13 @@ namespace MarketingBox.Integration.Service.Services
         private const string StartFrom2021 = "2021-01-01";
         private readonly MyTaskTimer _operationsTimer;
         private readonly ILogger<RegistrationsBackgroundService> _logger;
-        private readonly IDepositService _depositRegistrationService;
+        private readonly ICrmService _depositRegistrationService;
         private readonly BridgeStorage _bridgeStorage;
         private readonly IRegistrationsLogRepository _repository;
 
         public RegistrationsBackgroundService(
             ILogger<RegistrationsBackgroundService> logger,
-            IDepositService depositRegistrationService,
+            ICrmService depositRegistrationService,
             BridgeStorage bridgeStorage,
             IRegistrationsLogRepository repository)
         {
@@ -114,8 +115,8 @@ namespace MarketingBox.Integration.Service.Services
                                 await _repository.SaveAsync(itemFromDb);
 
                                 // TODO Add new method for crm update
-                                //var storeResponse = await _depositRegistrationService.RegisterDepositAsync(
-                                //    MapToRequest(item, bridge.Value));
+                                await _depositRegistrationService
+                                    .SetCrmStatusAsync(MapToRequest(itemFromDb));
                                 _logger.LogInformation("New crm status {@Registration}", itemFromDb);
                             }
 
@@ -133,18 +134,18 @@ namespace MarketingBox.Integration.Service.Services
             }
         }
 
-        private MarketingBox.Registration.Service.Grpc.Models.Deposits.Contracts.DepositCreateRequest MapToRequest(
-            RegistrationReporting message,
-            MarketingBox.Integration.Service.Storage.Bridge bridge)
+        private MarketingBox.Registration.Service.Grpc.Models.Crm.UpdateCrmStatusRequest MapToRequest(
+            MarketingBox.Integration.Service.Domain.Registrations.RegistrationLog message)
         {
-            return new MarketingBox.Registration.Service.Grpc.Models.Deposits.Contracts.DepositCreateRequest()
+            return new MarketingBox.Registration.Service.Grpc.Models.Crm.UpdateCrmStatusRequest()
             {
                 CustomerId = message.CustomerId,
-                Email = message.CustomerEmail,
-                BrandName = bridge.IntegrationName,
-                BrandId = bridge.IntegrationId,
-                TenantId = bridge.TenantId,
-                CreatedAt = DateTime.UtcNow,
+                Crm = message.Crm.MapEnum<Registration.Service.Domain.Crm.CrmStatus>(),  
+                CrmUpdatedAt = message.CrmUpdatedAt,
+                IntegrationId = message.IntegrationId,
+                IntegrationName = message.IntegrationName,
+                RegistrationId = message.RegistrationId,
+                RegistrationUniqueId = message.RegistrationUniqueId,
             };
         }
 
