@@ -22,18 +22,18 @@ namespace MarketingBox.Integration.Service.Services
         private const string StartFrom2021 = "2021-01-01";
         private readonly MyTaskTimer _operationsTimer;
         private readonly ILogger<RegistrationsBackgroundService> _logger;
-        private readonly ICrmService _depositRegistrationService;
+        private readonly ICrmService _crmRegistrationService;
         private readonly BridgeStorage _bridgeStorage;
         private readonly IRegistrationsLogRepository _repository;
 
         public RegistrationsBackgroundService(
             ILogger<RegistrationsBackgroundService> logger,
-            ICrmService depositRegistrationService,
+            ICrmService crmRegistrationService,
             BridgeStorage bridgeStorage,
             IRegistrationsLogRepository repository)
         {
             _logger = logger;
-            _depositRegistrationService = depositRegistrationService;
+            _crmRegistrationService = crmRegistrationService;
             _operationsTimer = new MyTaskTimer(nameof(RegistrationsBackgroundService), TimeSpan.FromSeconds(TimerSpan30Sec), logger, Process);
             _bridgeStorage = bridgeStorage;
             _repository = repository;
@@ -115,7 +115,7 @@ namespace MarketingBox.Integration.Service.Services
                                 await _repository.SaveAsync(itemFromDb);
 
                                 // TODO Add new method for crm update
-                                await _depositRegistrationService
+                                await _crmRegistrationService
                                     .SetCrmStatusAsync(MapToRequest(itemFromDb));
                                 _logger.LogInformation("New crm status {@Registration}", itemFromDb);
                             }
