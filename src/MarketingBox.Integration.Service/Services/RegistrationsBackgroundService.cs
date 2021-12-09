@@ -54,15 +54,17 @@ namespace MarketingBox.Integration.Service.Services
             {
                 try
                 {
-                    var potentionalCrmStatusUpdaters = (await _repository.GetPotentionalDepositorsByBrandAsync(
-                        bridge.Value.TenantId, bridge.Value.IntegrationId))
+                    var potentionalCrmStatusUpdatersDb = await _repository.GetPotentionalDepositorsByBrandAsync(
+                        bridge.Value.TenantId, bridge.Value.IntegrationId);
+
+                    var potentionalCrmStatusUpdaters = potentionalCrmStatusUpdatersDb
                         .Select(i => new RegistrationReporting
                         {
                             CustomerEmail = i.CustomerEmail,
                             CustomerId = i.CustomerId,
                             CreatedAt = i.CreatedAt,
                             Crm = i.Crm,
-                            CrmStatusChangedAt = i.CrmUpdatedAt
+                            CrmUpdatedAt = i.CrmUpdatedAt
 
                         });
 
@@ -81,12 +83,24 @@ namespace MarketingBox.Integration.Service.Services
                             }
                             // Notify only new crm updates
                             var updateList = realCrmStatusUpdaters.Items.Intersect(potentionalCrmStatusUpdaters);
-                            foreach (var item in updateList)
+                            foreach (var updateItem in updateList)
                             {
+                                var itemFromDb = potentionalCrmStatusUpdatersDb.FirstOrDefault(x => x.CustomerId.Equals(updateItem.CustomerId));
+                                if (itemFromDb == null)
+                                {
+                                    _logger.LogWarning("Can't find registration in db {@Registration}", updateItem);
+                                    continue;
+                                };
+                                
+                                itemFromDb.CrmUpdatedAt = updateItem.CrmUpdatedAt;
+                                itemFromDb.Crm = updateItem.Crm;
+                                itemFromDb.Sequence++;
+                                await _repository.SaveAsync(itemFromDb);
+
                                 // TODO Add new method for crm update
                                 //var storeResponse = await _depositRegistrationService.RegisterDepositAsync(
                                 //    MapToRequest(item, bridge.Value));
-                                _logger.LogInformation("Get new crm status {@Registration}", item);
+                                _logger.LogInformation("New crm status {@Registration}", itemFromDb);
                             }
 
                             count = realCrmStatusUpdaters.Items.Count;

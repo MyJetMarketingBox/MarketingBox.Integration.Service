@@ -1,4 +1,5 @@
 ﻿using System;
+using Destructurama.Attributed;
 using MarketingBox.Integration.Service.Domain.Registrations;
 
 namespace MarketingBox.Integration.Postgres.Entities
@@ -11,6 +12,7 @@ namespace MarketingBox.Integration.Postgres.Entities
         public DateTime CreatedAt { get; set; }
         public long AffiliateId { get; set; }
         public string CustomerId { get; set; }
+        [LogMasked(PreserveLength = true, ShowFirst = 2, ShowLast = 2)]
         public string CustomerEmail { get; set; }
         public DateTime CustomerCreatedAt { get; set; }
         public bool Depositor { get; set; }

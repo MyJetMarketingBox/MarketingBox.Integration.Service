@@ -53,14 +53,17 @@ namespace MarketingBox.Integration.Service.Services
             {
                 try
                 {
-                    var potentionalDepositors = (await _repository.GetPotentionalDepositorsByBrandAsync(
-                        bridge.Value.TenantId, bridge.Value.IntegrationId))
+                    var potentionalDepositorsFromDb = await _repository.GetPotentionalDepositorsByBrandAsync(
+                        bridge.Value.TenantId, bridge.Value.IntegrationId);
+
+                    var potentionalDepositors = potentionalDepositorsFromDb
                         .Select(i => new DepositorReporting
                         {
                             CustomerEmail = i.CustomerEmail,
                             CustomerId = i.CustomerId,
                             DepositedAt = i.DepositedAt
                         });
+
 
                     var request = ReportingRequest.Create(DateTime.Parse(StartFrom2021), PageSize100);
                     // Search by Period starting from the 2021
@@ -75,13 +78,25 @@ namespace MarketingBox.Integration.Service.Services
                             {
                                 break;
                             }
-                            // Notify only new potentional depositors
+                            // Update and notify only new potentional depositors
                             var updateList = realDepositors.Items.Intersect(potentionalDepositors);
-                            foreach (var item in updateList)
+                            foreach (var updateItem in updateList)
                             {
+                                var itemFromDb = potentionalDepositorsFromDb.FirstOrDefault(x => x.CustomerId.Equals(updateItem.CustomerId));
+                                if (itemFromDb == null)
+                                {
+                                    _logger.LogWarning("Can't find depositor in db {@Registration}", updateItem);
+                                    continue;
+                                };
+
+                                itemFromDb.Depositor = true;
+                                itemFromDb.DepositedAt = updateItem.DepositedAt;
+                                itemFromDb.Sequence++;
+                                await _repository.SaveAsync(itemFromDb);
+
                                 var storeResponse = await _depositRegistrationService.RegisterDepositAsync(
-                                    MapToRequest(item, bridge.Value));
-                                _logger.LogInformation("Get new depositor {@Registration}", item);
+                                    MapToRequest(updateItem, bridge.Value));
+                                _logger.LogInformation("New depositor added {@Registration}", itemFromDb);
                             }
 
                             count = realDepositors.Items.Count;

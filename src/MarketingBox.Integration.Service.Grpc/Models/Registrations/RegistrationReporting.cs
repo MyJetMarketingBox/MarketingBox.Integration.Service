@@ -1,4 +1,5 @@
-﻿using MarketingBox.Integration.Service.Domain.Registrations;
+﻿using Destructurama.Attributed;
+using MarketingBox.Integration.Service.Domain.Registrations;
 using System;
 using System.Runtime.Serialization;
 
@@ -12,6 +13,7 @@ namespace MarketingBox.Integration.Service.Grpc.Models.Registrations
         public string CustomerId { get; set; }
 
         [DataMember(Order = 2)]
+        [LogMasked(PreserveLength = true, ShowFirst = 2, ShowLast = 2)]
         public string CustomerEmail { get; set; }
 
         [DataMember(Order = 3)]
@@ -21,6 +23,6 @@ namespace MarketingBox.Integration.Service.Grpc.Models.Registrations
         public DateTime CreatedAt { get; set; }
 
         [DataMember(Order = 5)]
-        public DateTime CrmStatusChangedAt { get; set; }
+        public DateTime CrmUpdatedAt { get; set; }
     }
 }
