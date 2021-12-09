@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using MarketingBox.Integration.Service.Domain.Repositories;
+using MarketingBox.Integration.Service.Domain.Utils;
 using MarketingBox.Integration.Service.Grpc.Models.Registrations;
 using MarketingBox.Integration.Service.Grpc.Models.Registrations.Contracts.Bridge;
 using MarketingBox.Integration.Service.Storage;
@@ -57,6 +58,12 @@ namespace MarketingBox.Integration.Service.Services
                     var potentionalCrmStatusUpdatersDb = await _repository.GetPotentionalDepositorsByBrandAsync(
                         bridge.Value.TenantId, bridge.Value.IntegrationId);
 
+                    // Nothing to find
+                    if (potentionalCrmStatusUpdatersDb.Count == 0)
+                    {
+                        continue;
+                    }
+
                     var potentionalCrmStatusUpdaters = potentionalCrmStatusUpdatersDb
                         .Select(i => new RegistrationReporting
                         {
@@ -82,7 +89,12 @@ namespace MarketingBox.Integration.Service.Services
                                 break;
                             }
                             // Notify only new crm updates
-                            var updateList = realCrmStatusUpdaters.Items.Intersect(potentionalCrmStatusUpdaters);
+                            var intersectList = realCrmStatusUpdaters.Items
+                                .Select(a => a.CustomerId)
+                                .Intersect(potentionalCrmStatusUpdaters.Select(b => b.CustomerId));
+
+                            var updateList = realCrmStatusUpdaters.Items.Where(x => intersectList.Contains(x.CustomerId));
+
                             foreach (var updateItem in updateList)
                             {
                                 var itemFromDb = potentionalCrmStatusUpdatersDb.FirstOrDefault(x => x.CustomerId.Equals(updateItem.CustomerId));
@@ -91,7 +103,11 @@ namespace MarketingBox.Integration.Service.Services
                                     _logger.LogWarning("Can't find registration in db {@Registration}", updateItem);
                                     continue;
                                 };
-                                
+
+                                if (itemFromDb.Crm == updateItem.Crm)
+                                {
+                                    continue;
+                                }
                                 itemFromDb.CrmUpdatedAt = updateItem.CrmUpdatedAt;
                                 itemFromDb.Crm = updateItem.Crm;
                                 itemFromDb.Sequence++;
@@ -108,7 +124,7 @@ namespace MarketingBox.Integration.Service.Services
 
                         } while (count == request.PageSize);
                         request.NextMonth();
-                    } while (request.DateTo <= DateTime.UtcNow);
+                    } while (request.DateTo <= CalendarUtils.EndOfMonth(DateTime.UtcNow));
                 }
                 catch (Exception e)
                 {

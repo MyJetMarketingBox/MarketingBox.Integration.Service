@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MarketingBox.Integration.Service.Domain.Utils;
+using System;
 using System.Runtime.Serialization;
 
 namespace MarketingBox.Integration.Service.Grpc.Models.Registrations.Contracts.Bridge
@@ -20,13 +21,13 @@ namespace MarketingBox.Integration.Service.Grpc.Models.Registrations.Contracts.B
 
         [DataMember(Order = 5)]
         public int PageSize { get; set; }
-        
-        public static ReportingRequest Create(DateTime startFrom, int pageSize = 100)
+
+        public static ReportingRequest Create(DateTime currMonth, int pageSize = 100)
         {
             var request = new ReportingRequest()
             {
-                DateFrom = startFrom,
-                DateTo = startFrom.AddMonths(1),
+                DateFrom = CalendarUtils.StartOfMonth(currMonth),
+                DateTo = CalendarUtils.EndOfMonth(currMonth),
                 PageIndex = 1,
                 PageSize = pageSize,
             };
@@ -40,8 +41,9 @@ namespace MarketingBox.Integration.Service.Grpc.Models.Registrations.Contracts.B
 
         public void NextMonth()
         {
-            DateFrom = DateFrom.AddMonths(1);
-            DateTo = DateTo.AddMonths(1);
+            DateTime nextMonth = DateFrom.AddMonths(1);
+            DateFrom = CalendarUtils.StartOfMonth(nextMonth);
+            DateTo = CalendarUtils.EndOfMonth(nextMonth);
             PageIndex = 1;
         }
     }

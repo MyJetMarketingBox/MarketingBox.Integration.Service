@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using MarketingBox.Integration.Service.Domain.Repositories;
+using MarketingBox.Integration.Service.Domain.Utils;
 using MarketingBox.Integration.Service.Grpc.Models.Registrations;
 using MarketingBox.Integration.Service.Grpc.Models.Registrations.Contracts.Bridge;
 using MarketingBox.Integration.Service.Storage;
@@ -56,6 +57,12 @@ namespace MarketingBox.Integration.Service.Services
                     var potentionalDepositorsFromDb = await _repository.GetPotentionalDepositorsByBrandAsync(
                         bridge.Value.TenantId, bridge.Value.IntegrationId);
 
+                    // Nothing to find
+                    if (potentionalDepositorsFromDb.Count == 0)
+                    {
+                        continue;
+                    }
+
                     var potentionalDepositors = potentionalDepositorsFromDb
                         .Select(i => new DepositorReporting
                         {
@@ -63,7 +70,6 @@ namespace MarketingBox.Integration.Service.Services
                             CustomerId = i.CustomerId,
                             DepositedAt = i.DepositedAt
                         });
-
 
                     var request = ReportingRequest.Create(DateTime.Parse(StartFrom2021), PageSize100);
                     // Search by Period starting from the 2021
@@ -79,7 +85,12 @@ namespace MarketingBox.Integration.Service.Services
                                 break;
                             }
                             // Update and notify only new potentional depositors
-                            var updateList = realDepositors.Items.Intersect(potentionalDepositors);
+                            var intersectList = realDepositors.Items
+                                .Select(a => a.CustomerId)
+                                .Intersect(potentionalDepositors.Select(b => b.CustomerId));
+
+                            var updateList = realDepositors.Items.Where(x => intersectList.Contains(x.CustomerId));
+
                             foreach (var updateItem in updateList)
                             {
                                 var itemFromDb = potentionalDepositorsFromDb.FirstOrDefault(x => x.CustomerId.Equals(updateItem.CustomerId));
@@ -104,7 +115,7 @@ namespace MarketingBox.Integration.Service.Services
 
                         } while (count == request.PageSize);
                         request.NextMonth();
-                    } while (request.DateTo <= DateTime.UtcNow);
+                    } while (request.DateTo <= CalendarUtils.EndOfMonth(DateTime.UtcNow));
                 }
                 catch (Exception e)
                 {
