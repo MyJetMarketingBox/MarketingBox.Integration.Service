@@ -59,7 +59,7 @@ namespace MarketingBox.Integration.Postgres.Repositories
             r.""IntegrationName"",
             r.""IntegrationId"",
             r.""Sequence""
-            FROM ""reporting-service"".registrations AS r
+            FROM ""integration-service"".registrationslogs AS r
             WHERE r.""TenantId"" = @TenantId AND r.""IntegrationId"" = @IntegrationId AND r.""Depositor"" = {depositor}
             ORDER BY r.""RegistrationId"" ASC";
 
@@ -100,7 +100,7 @@ namespace MarketingBox.Integration.Postgres.Repositories
             r.""IntegrationName"",
             r.""IntegrationId"",
             r.""Sequence""
-            FROM ""reporting-service"".registrations AS r
+            FROM ""integration-service"".registrationslogs AS r
             WHERE r.""TenantId"" = @TenantId AND r.""Depositor"" = false
             {where}
             ORDER BY r.""RegistrationId"" ASC";

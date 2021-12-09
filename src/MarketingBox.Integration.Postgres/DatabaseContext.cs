@@ -42,7 +42,7 @@ namespace MarketingBox.Integration.Postgres
             modelBuilder.Entity<RegistrationLogEntity>().ToTable(RegistrationsLogTableName);
             modelBuilder.Entity<RegistrationLogEntity>().HasKey(e => e.RegistrationId);
             modelBuilder.Entity<RegistrationLogEntity>().HasIndex(e => new {e.TenantId, e.RegistrationId});
-            modelBuilder.Entity<RegistrationLogEntity>().HasIndex(e => new { e.TenantId, e.IntegrationId, e.CustomerId });
+            modelBuilder.Entity<RegistrationLogEntity>().HasIndex(e => new {e.TenantId, e.IntegrationId, e.CustomerId });
         }
             
         public override void Dispose()
