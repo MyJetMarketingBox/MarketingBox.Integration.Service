@@ -10,7 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Models\Reporting\" />
+    <ProjectReference Include="..\MarketingBox.Integration.Service.Domain\MarketingBox.Integration.Service.Domain.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

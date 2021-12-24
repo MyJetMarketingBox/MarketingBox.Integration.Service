@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Destructurama.Attributed;
+using System;
 using System.Runtime.Serialization;
 
 namespace MarketingBox.Integration.Service.Grpc.Models.Registrations
@@ -11,6 +12,7 @@ namespace MarketingBox.Integration.Service.Grpc.Models.Registrations
         public string CustomerId { get; set; }
 
         [DataMember(Order = 2)]
+        [LogMasked(PreserveLength = true, ShowFirst = 2, ShowLast = 2)]
         public string CustomerEmail { get; set; }
 
         [DataMember(Order = 3)]

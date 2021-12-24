@@ -4,19 +4,15 @@ using MarketingBox.Integration.Service.Modules;
 using MarketingBox.Integration.Service.Services;
 using MarketingBox.Integration.Postgres;
 using MarketingBox.Integration.Service.Client;
-using MarketingBox.Integration.Service.Grpc;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using MyJetWallet.Sdk.GrpcMetrics;
 using MyJetWallet.Sdk.GrpcSchema;
 using MyJetWallet.Sdk.Postgres;
 using MyJetWallet.Sdk.Service;
 using Prometheus;
-using ProtoBuf.Grpc.Server;
-using SimpleTrading.BaseMetrics;
 using SimpleTrading.ServiceStatusReporterConnector;
 
 namespace MarketingBox.Integration.Service
@@ -30,9 +26,9 @@ namespace MarketingBox.Integration.Service
             services.AddHostedService<ApplicationLifetimeManager>();
 
             DatabaseContext.LoggerFactory = Program.LogFactory;
-            //services.AddDatabase(DatabaseContext.Schema, 
-            //    Program.Settings.PostgresConnectionString, 
-            //    o => new DatabaseContext(o));
+            services.AddDatabase(DatabaseContext.Schema, 
+                Program.Settings.PostgresConnectionString, 
+                o => new DatabaseContext(o));
             
             DatabaseContext.LoggerFactory = null;
 
@@ -56,7 +52,7 @@ namespace MarketingBox.Integration.Service
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapGrpcSchema<IntegrationService, IIntegrationService>();
+                endpoints.MapGrpcSchema<SendRegistrationsService, IIntegrationService>();
 
                 endpoints.MapGrpcSchemaRegistry();
 
@@ -71,6 +67,7 @@ namespace MarketingBox.Integration.Service
         {
             builder.RegisterModule<SettingsModule>();
             builder.RegisterModule<ServiceModule>();
+            builder.RegisterModule<RepositoryModule>();
         }
     }
 }
