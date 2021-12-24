@@ -25,5 +25,8 @@ namespace MarketingBox.Integration.Service.Grpc.Models.Registrations.Contracts.I
 
         [DataMember(Order = 7)]
         public long IntegrationId { get; set; }
+
+        [DataMember(Order = 8)]
+        public long AffiliateId { get; set; }
     }
 }

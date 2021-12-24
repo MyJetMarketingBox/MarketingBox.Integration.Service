@@ -1,6 +1,5 @@
 ﻿using Autofac;
 
-using MarketingBox.Integration.Service.Grpc;
 
 // ReSharper disable UnusedMember.Global
 

@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
-using MarketingBox.Integration.Bridge.Client;
 using MarketingBox.Integration.Service.Client;
 using MarketingBox.Integration.Service.Grpc.Models.Common;
 using MarketingBox.Integration.Service.Storage;
@@ -9,25 +8,25 @@ using MarketingBox.Integration.Service.Utils;
 using MarketingBox.Integration.Service.Grpc.Models.Registrations;
 using Error = MarketingBox.Integration.Service.Grpc.Models.Common.Error;
 using ErrorType = MarketingBox.Integration.Service.Grpc.Models.Common.ErrorType;
-
+using MarketingBox.Integration.Service.Domain.Repositories;
+using MarketingBox.Integration.Service.Domain.Registrations;
 
 namespace MarketingBox.Integration.Service.Services
 {
-    public class IntegrationService : IIntegrationService
+    public class SendRegistrationsService : IIntegrationService
     {
-        private readonly ILogger<IntegrationService> _logger;
-        private readonly BridgeServiceWrapper _bridgeServiceWrapper;
-        private readonly IDepositUpdateStorage _depositUpdateStorage;
+        private readonly ILogger<SendRegistrationsService> _logger;
+        private readonly BridgeStorage _bridgeStorage;
+        private readonly IRegistrationsLogRepository _repository;
 
 
-        public IntegrationService(ILogger<IntegrationService> logger,
-            BridgeServiceWrapper bridgeServiceWrapper,
-            IDepositUpdateStorage depositUpdateStorage
-            )
+        public SendRegistrationsService(ILogger<SendRegistrationsService> logger,
+            BridgeStorage bridgeStorage, 
+            IRegistrationsLogRepository repository)
         {
             _logger = logger;
-            _bridgeServiceWrapper = bridgeServiceWrapper;
-            _depositUpdateStorage = depositUpdateStorage;
+            _bridgeStorage = bridgeStorage;
+            _repository = repository;
         }
 
         public async Task<Grpc.Models.Registrations.Contracts.Integration.RegistrationResponse> SendRegisterationAsync(Grpc.Models.Registrations.Contracts.Integration.RegistrationRequest request)
@@ -63,22 +62,45 @@ namespace MarketingBox.Integration.Service.Services
                         Sub9 = request.AdditionalInfo.Sub9,
                         Sub10 = request.AdditionalInfo.Sub10,
                     },
-                };
+                 };
 
-                 var customerInfo =
-                     await _bridgeServiceWrapper.TryGetService(request.IntegrationName).SendRegistrationAsync(registration);
+                var bridge = _bridgeStorage.Get(request.IntegrationId);
+                if (bridge == null)
+                {
+                    _logger.LogWarning("Can't find bridge for integration {@context}", request);
+                    return new Grpc.Models.Registrations.Contracts.Integration.RegistrationResponse()
+                    {
+                        Error = new Error()
+                        {
+                            Message = $"Can't find bridge for integration {request.IntegrationName} {request.IntegrationId}",
+                            Type = ErrorType.NoIntegration
+                        }
+                    };
+                }
 
-                //TODO: Move deposit generator to another service
+                var customerInfo = await bridge.Service.SendRegistrationAsync(registration);
+
+                //Store successfull customers registrations
                 if (customerInfo.ResultCode == ResultCode.CompletedSuccessfully)
                 {
-                    _depositUpdateStorage.Add(request.RegistrationUniqueId, new DepositUpdateMessage()
+                    var dt = DateTime.UtcNow;
+                    await _repository.SaveAsync(new RegistrationLog
                     {
-                        IntegrationName = request.IntegrationName,
-                        CustomerId = customerInfo.CustomerInfo.CustomerId,
-                        Email = request.Info.Email,
                         TenantId = request.TenantId,
-                        Sequence = 0,
+                        RegistrationId = request.RegistrationId,
+                        RegistrationUniqueId = request.RegistrationUniqueId,
+                        CreatedAt = dt,
+                        AffiliateId = request.AffiliateId,
+                        CustomerId = customerInfo.CustomerInfo.CustomerId,
+                        CustomerEmail = request.Info.Email,
+                        CustomerCreatedAt = dt,
+                        Depositor = false,
+                        //DepositedAt = null,
+                        Crm = CrmStatus.New,
+                        CrmUpdatedAt = dt,
+                        IntegrationName = request.IntegrationName,
                         IntegrationId = request.IntegrationId,
+                        Sequence = 0
                     });
                 }
 
