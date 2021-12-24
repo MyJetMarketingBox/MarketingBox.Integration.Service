@@ -40,7 +40,7 @@ jobs:
       run: ls
 
     - name: Publish Service
-      run: dotnet publish ./src/MarketingBox.Affiliate.Service/MarketingBox.Affiliate.Service.csproj --configuration Release /p:AssemblyVersion=${GITHUB_REF#refs/tags/} --output ./publish-api
+      run: dotnet publish ./src/${{ github.event.repository.name }}/${{ github.event.repository.name }}.csproj --configuration Release /p:AssemblyVersion=${GITHUB_REF#refs/tags/} --output ./publish-api
 
     - name: Check Service dir
       run: ls ./publish-api
