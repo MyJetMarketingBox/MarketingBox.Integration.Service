@@ -65,7 +65,6 @@ jobs:
   update_version_master:
     needs: build
     runs-on: ubuntu-latest
-    if: ${{ steps.branch.outputs.branch_name == 'master' }}
     steps:
     - uses: actions/checkout@v2
     - name: Extract branch name
