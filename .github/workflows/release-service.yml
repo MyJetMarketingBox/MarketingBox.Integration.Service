@@ -64,6 +64,7 @@ jobs:
 
   update_version_master:
     needs: build
+    if: github.ref == 'ref/heads/master'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -84,6 +85,34 @@ jobs:
     - run: ls
     - run: sed -i s/${{ steps.string.outputs.lowercase }}-master:.*/${{ steps.string.outputs.lowercase }}-master:${GITHUB_REF#refs/tags/}/g services/*/deployment*
     - run: |        
+        git config user.name github-actions
+        git config user.email github-actions@github.com
+        git commit -a -m "Update version of service ${{ steps.string.outputs.lowercase }}"
+        git push
+
+  update_version_uat:
+    needs: build
+    if: github.ref == 'ref/heads/uat'
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Extract branch name
+      uses: vazco/github-actions-branch-name@v1
+      id: branch
+
+    - id: string
+      uses: ASzc/change-string-case-action@v1
+      with:
+        string: ${{ github.event.repository.name }}
+    - name: get uat kube yamls
+      uses: actions/checkout@v2
+      with:
+        repository: MyJetMarketingBox/marketing-box-kubernates-infrastructure
+        ref: uat
+        token: ${{ secrets.UAT_GIT_TOKEN }}
+    - run: ls
+    - run: sed -i s/${{ steps.string.outputs.lowercase }}-uat:.*/${{ steps.string.outputs.lowercase }}-uat:${GITHUB_REF#refs/tags/}/g services/*/deployment*
+    - run: |
         git config user.name github-actions
         git config user.email github-actions@github.com
         git commit -a -m "Update version of service ${{ steps.string.outputs.lowercase }}"
