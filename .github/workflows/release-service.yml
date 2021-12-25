@@ -39,6 +39,8 @@ jobs:
       run: dotnet test --no-build --configuration Release
     - name: ls
       run: ls
+    - name: echo variable
+      run: echo ${GITHUB_REF#refs/tags/}
 
     - name: Publish Service
       run: dotnet publish ./src/${{ github.event.repository.name }}/${{ github.event.repository.name }}.csproj --configuration Release /p:AssemblyVersion=${GITHUB_REF#refs/tags/} --output ./publish-api
