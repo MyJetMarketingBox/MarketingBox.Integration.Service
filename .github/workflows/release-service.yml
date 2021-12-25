@@ -4,23 +4,14 @@ on:
   push:
     tags:
       - "*.*.*"
-      - "uat-*.*.*"
 
 jobs:
   build:
 
     runs-on: ubuntu-latest
+
     steps:
     - uses: actions/checkout@v2
-    - name: Name of branch
-      id: branch
-      uses: ashley-taylor/regex-property-action@1.2
-      with:
-        value: ${{ github.ref }}
-        regex: ".*/uat-"
-        flags: "" # Optional, defaults to "g"
-        replacement: ""
-
     - name: Extract branch name
       uses: vazco/github-actions-branch-name@v1
       id: branch
@@ -29,7 +20,7 @@ jobs:
       uses: ASzc/change-string-case-action@v1
       with:
         string: ${{ github.event.repository.name }}
-
+    - uses: actions/checkout@v2
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
@@ -41,6 +32,15 @@ jobs:
       with:
         format: YYYY-MM-DD HH:mm:ss
         utcOffset: "+00:00"
+
+    - name: Name of branch
+      id: branch
+      uses: ashley-taylor/regex-property-action@1.2
+      with:
+        value: ${{ github.ref }}
+        regex: ".*/uat-"
+        flags: "" # Optional, defaults to "g"
+        replacement: ""
 
     - name: Build
       run: dotnet build --configuration Release /p:AssemblyVersion=${{ steps.branch.outputs.value }}
@@ -54,7 +54,7 @@ jobs:
     - name: Check Service dir
       run: ls ./publish-api
 
-    - name: Publish image MBOX
+    - name: Publish image ST
       uses: docker/build-push-action@v1
       with:
         username: ${{ secrets.MBOX_REGISTRY_USER }}
@@ -70,14 +70,7 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-    - name: Name of branch
-      id: branch
-      uses: ashley-taylor/regex-property-action@1.2
-      with:
-        value: ${{ github.ref }}
-        regex: ".*/uat-"
-        flags: "" # Optional, defaults to "g"
-        replacement: ""
+
     - uses: actions/checkout@v2
     - name: Extract branch name
       uses: vazco/github-actions-branch-name@v1
@@ -87,7 +80,18 @@ jobs:
       uses: ASzc/change-string-case-action@v1
       with:
         string: ${{ github.event.repository.name }}
+
+    - name: Name of branch
+      id: branch
+      uses: ashley-taylor/regex-property-action@1.2
+      with:
+        value: ${{ github.ref }}
+        regex: ".*/uat-"
+        flags: "" # Optional, defaults to "g"
+        replacement: ""
+        
     - name: get master kube yamls
+      uses: actions/checkout@v2
       with:
         repository: MyJetMarketingBox/marketing-box-kubernates-infrastructure
         ref: master
