@@ -4,6 +4,7 @@ on:
   push:
     tags:
       - "*.*.*"
+      - "uat-*.*.*"
 
 jobs:
   build:
@@ -11,7 +12,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - name: Name of branch
+      id: branch
+      uses: ashley-taylor/regex-property-action@1.2
+      with:
+        value: ${{ github.ref }}
+        regex: ".*/uat-"
+        flags: "" # Optional, defaults to "g"
+        replacement: ""
+
     - uses: actions/checkout@v2
+
     - name: Extract branch name
       uses: vazco/github-actions-branch-name@v1
       id: branch
@@ -20,7 +31,7 @@ jobs:
       uses: ASzc/change-string-case-action@v1
       with:
         string: ${{ github.event.repository.name }}
-    - uses: actions/checkout@v2
+
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
@@ -34,23 +45,18 @@ jobs:
         utcOffset: "+00:00"
 
     - name: Build
-      run: dotnet build --configuration Release /p:AssemblyVersion=${GITHUB_REF#refs/tags/}
+      run: dotnet build --configuration Release /p:AssemblyVersion=${{ steps.branch.outputs.value }}
     - name: Test
       run: dotnet test --no-build --configuration Release
     - name: ls
       run: ls
 
     - name: Publish Service
-      run: dotnet publish ./src/${{ github.event.repository.name }}/${{ github.event.repository.name }}.csproj --configuration Release /p:AssemblyVersion=${GITHUB_REF#refs/tags/} --output ./publish-api
+      run: dotnet publish ./src/${{ github.event.repository.name }}/${{ github.event.repository.name }}.csproj --configuration Release /p:AssemblyVersion=${{ steps.branch.outputs.value }} --output ./publish-api
     - name: Check Service dir
       run: ls ./publish-api
 
-    - name: Extract branch name
-      shell: bash
-      run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/tags/})"
-      id: extract_branch
-
-    - name: Publish image ST
+    - name: Publish image MBOX
       uses: docker/build-push-action@v1
       with:
         username: ${{ secrets.MBOX_REGISTRY_USER }}
@@ -59,14 +65,21 @@ jobs:
         registry: ${{ secrets.MBOX_REGISTRY_URL }}
         repository: marketingbox/${{ steps.string.outputs.lowercase }}-master
         tag_with_ref: true
-        build_args: app_version=${{ steps.string.outputs.lowercase }}-master:${{ steps.extract_branch.outputs.branch }},app_compilation_date=${{ steps.current-time.outputs.formattedTime }}
+        build_args: app_version=${{ steps.string.outputs.lowercase }}-master:${{ steps.branch.outputs.value }},app_compilation_date=${{ steps.current-time.outputs.formattedTime }}
 
 
   update_version_master:
     needs: build
     runs-on: ubuntu-latest
     steps:
-
+    - name: Name of branch
+      id: branch
+      uses: ashley-taylor/regex-property-action@1.2
+      with:
+        value: ${{ github.ref }}
+        regex: ".*/uat-"
+        flags: "" # Optional, defaults to "g"
+        replacement: ""
     - uses: actions/checkout@v2
     - name: Extract branch name
       uses: vazco/github-actions-branch-name@v1
@@ -77,13 +90,12 @@ jobs:
       with:
         string: ${{ github.event.repository.name }}
     - name: get master kube yamls
-      uses: actions/checkout@v2
       with:
         repository: MyJetMarketingBox/marketing-box-kubernates-infrastructure
         ref: master
         token: ${{ secrets.UAT_GIT_TOKEN }}
     - run: ls
-    - run: sed -i s/${{ steps.string.outputs.lowercase }}-master:.*/${{ steps.string.outputs.lowercase }}-master:${GITHUB_REF#refs/tags/}/g services/*/deployment*
+    - run: sed -i s/${{ steps.string.outputs.lowercase }}-master:.*/${{ steps.string.outputs.lowercase }}-master:${{ steps.branch.outputs.value }}/g services/*/deployment*
     - run: |        
         git config user.name github-actions
         git config user.email github-actions@github.com
