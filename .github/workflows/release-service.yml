@@ -3,9 +3,7 @@ name: Release Service
 on:
   push:
     tags:
-      - "v*.*.*"
-      - "v[0-9]+.[0-9]+"
-      - "[0-9]+.[0-9]+"
+      - "*.*.*"
 jobs:
   build:
 
@@ -42,7 +40,7 @@ jobs:
       run: ls
 
     - name: Publish Service
-      run: dotnet publish ./src/MarketingBox.Affiliate.Service/MarketingBox.Affiliate.Service.csproj --configuration Release /p:AssemblyVersion=${GITHUB_REF#refs/tags/} --output ./publish-api
+      run: dotnet publish ./src/${{ github.event.repository.name }}/${{ github.event.repository.name }}.csproj --configuration Release /p:AssemblyVersion=${GITHUB_REF#refs/tags/} --output ./publish-api
 
     - name: Check Service dir
       run: ls ./publish-api
@@ -59,13 +57,14 @@ jobs:
         password: ${{ secrets.MBOX_REGISTRY_PASS }}
         path: ./publish-api
         registry: ${{ secrets.MBOX_REGISTRY_URL }}
-        repository: marketingbox/${{ steps.string.outputs.lowercase }}
+        repository: marketingbox/${{ steps.string.outputs.lowercase }}-master
         tag_with_ref: true
-        build_args: app_version=${{ steps.string.outputs.lowercase }}:${{ steps.extract_branch.outputs.branch }},app_compilation_date=${{ steps.current-time.outputs.formattedTime }}
+        build_args: app_version=${{ steps.string.outputs.lowercase }}-master:${{ steps.extract_branch.outputs.branch }},app_compilation_date=${{ steps.current-time.outputs.formattedTime }}
 
 
-  update_version_test:
+  update_version_master:
     needs: build
+    if: github.ref == 'ref/heads/master'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -77,19 +76,15 @@ jobs:
       uses: ASzc/change-string-case-action@v1
       with:
         string: ${{ github.event.repository.name }}
-      if: ${{ steps.branch.outputs.branch_name == 'test' }}
-    - name: get test kube yamls
+    - name: get master kube yamls
       uses: actions/checkout@v2
       with:
         repository: MyJetMarketingBox/marketing-box-kubernates-infrastructure
-        ref: test
+        ref: master
         token: ${{ secrets.UAT_GIT_TOKEN }}
-    - run: |
-        pattern=${{ steps.string.outputs.lowercase }}:.*$
-        imagename=${{ steps.string.outputs.lowercase }}:${GITHUB_REF#refs/tags/}
-        reg=$"s/${pattern}/${imagename}/g"
-        echo $reg
-        find . -type f -name "deployment.*" -print0 -exec sed -i -r $reg {} \;
+    - run: ls
+    - run: sed -i s/${{ steps.string.outputs.lowercase }}-master:.*/${{ steps.string.outputs.lowercase }}-master:${GITHUB_REF#refs/tags/}/g services/*/deployment*
+    - run: |        
         git config user.name github-actions
         git config user.email github-actions@github.com
         git commit -a -m "Update version of service ${{ steps.string.outputs.lowercase }}"
@@ -97,6 +92,7 @@ jobs:
 
   update_version_uat:
     needs: build
+    if: github.ref == 'ref/heads/uat'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -108,50 +104,15 @@ jobs:
       uses: ASzc/change-string-case-action@v1
       with:
         string: ${{ github.event.repository.name }}
-      if: ${{ steps.branch.outputs.branch_name == 'uat' }}
     - name: get uat kube yamls
       uses: actions/checkout@v2
       with:
         repository: MyJetMarketingBox/marketing-box-kubernates-infrastructure
         ref: uat
         token: ${{ secrets.UAT_GIT_TOKEN }}
+    - run: ls
+    - run: sed -i s/${{ steps.string.outputs.lowercase }}-uat:.*/${{ steps.string.outputs.lowercase }}-uat:${GITHUB_REF#refs/tags/}/g services/*/deployment*
     - run: |
-        pattern=${{ steps.string.outputs.lowercase }}:.*$
-        imagename=${{ steps.string.outputs.lowercase }}:${GITHUB_REF#refs/tags/}
-        reg=$"s/${pattern}/${imagename}/g"
-        echo $reg
-        find . -type f -name "deployment.*" -print0 -exec sed -i -r $reg {} \;
-        git config user.name github-actions
-        git config user.email github-actions@github.com
-        git commit -a -m "Update version of service ${{ steps.string.outputs.lowercase }}"
-        git push
-
-  update_version_master:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: Extract branch name
-      uses: vazco/github-actions-branch-name@v1
-      id: branch
-
-    - id: string
-      uses: ASzc/change-string-case-action@v1
-      with:
-        string: ${{ github.event.repository.name }}
-      if: ${{ steps.branch.outputs.branch_name == 'master' }}
-    - name: get master kube yamls
-      uses: actions/checkout@v2
-      with:
-        repository: MyJetMarketingBox/marketing-box-kubernates-infrastructure
-        ref: master
-        token: ${{ secrets.UAT_GIT_TOKEN }}
-    - run: |
-        pattern=${{ steps.string.outputs.lowercase }}:.*$
-        imagename=${{ steps.string.outputs.lowercase }}:${GITHUB_REF#refs/tags/}
-        reg=$"s/${pattern}/${imagename}/g"
-        echo $reg
-        find . -type f -name "deployment.*" -print0 -exec sed -i -r $reg {} \;
         git config user.name github-actions
         git config user.email github-actions@github.com
         git commit -a -m "Update version of service ${{ steps.string.outputs.lowercase }}"
