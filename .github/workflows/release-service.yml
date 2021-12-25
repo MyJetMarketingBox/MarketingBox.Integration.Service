@@ -82,7 +82,7 @@ jobs:
         ref: master
         token: ${{ secrets.UAT_GIT_TOKEN }}
     - run: ls
-    - run: sed -i s/${{ steps.string.outputs.lowercase }}-master:.*/${{ steps.string.outputs.lowercase }}-master:${GITHUB_REF#refs/tags/}/g */deployment*
+    - run: sed -i s/${{ steps.string.outputs.lowercase }}-master:.*/${{ steps.string.outputs.lowercase }}-master:${GITHUB_REF#refs/tags/}/g services/*/deployment*
     - run: |        
         git config user.name github-actions
         git config user.email github-actions@github.com
