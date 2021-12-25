@@ -10,8 +10,8 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-
     steps:
+    - uses: actions/checkout@v2
     - name: Name of branch
       id: branch
       uses: ashley-taylor/regex-property-action@1.2
@@ -20,8 +20,6 @@ jobs:
         regex: ".*/uat-"
         flags: "" # Optional, defaults to "g"
         replacement: ""
-
-    - uses: actions/checkout@v2
 
     - name: Extract branch name
       uses: vazco/github-actions-branch-name@v1
@@ -32,7 +30,6 @@ jobs:
       with:
         string: ${{ github.event.repository.name }}
 
-    - uses: actions/checkout@v2
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
