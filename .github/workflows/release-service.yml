@@ -3,7 +3,7 @@ name: Release Service
 on:
   push:
     tags:
-      - "uat-*.*.*"
+      - "*.*.*"
 
 jobs:
   build:
@@ -33,20 +33,15 @@ jobs:
         format: YYYY-MM-DD HH:mm:ss
         utcOffset: "+00:00"
 
-    - name: version
-      run: |
-        fullref=${{ github.event.ref }}
-        version=${fullref:14}
-
     - name: Build
-      run: dotnet build --configuration Release /p:AssemblyVersion=$version
+      run: dotnet build --configuration Release /p:AssemblyVersion=${GITHUB_REF#refs/tags/}
     - name: Test
       run: dotnet test --no-build --configuration Release
     - name: ls
       run: ls
 
     - name: Publish Service
-      run: dotnet publish ./src/${{ github.event.repository.name }}/${{ github.event.repository.name }}.csproj --configuration Release /p:AssemblyVersion=$version --output ./publish-api
+      run: dotnet publish ./src/${{ github.event.repository.name }}/${{ github.event.repository.name }}.csproj --configuration Release /p:AssemblyVersion=${GITHUB_REF#refs/tags/} --output ./publish-api
     - name: Check Service dir
       run: ls ./publish-api
 
@@ -87,14 +82,8 @@ jobs:
         repository: MyJetMarketingBox/marketing-box-kubernates-infrastructure
         ref: master
         token: ${{ secrets.UAT_GIT_TOKEN }}
-
-    - name: version
-      run: |
-        fullref=${{ github.event.ref }}
-        version=${fullref:14}
-
     - run: ls
-    - run: sed -i s/${{ steps.string.outputs.lowercase }}-master:.*/${{ steps.string.outputs.lowercase }}-master:$version/g services/*/deployment*
+    - run: sed -i s/${{ steps.string.outputs.lowercase }}-master:.*/${{ steps.string.outputs.lowercase }}-master:${GITHUB_REF#refs/tags/}/g services/*/deployment*
     - run: |        
         git config user.name github-actions
         git config user.email github-actions@github.com
