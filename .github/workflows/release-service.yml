@@ -113,7 +113,6 @@ jobs:
 
   update_version_uat:
     needs: build
-#    if: github.ref == 'ref/heads/uat'
     if: startsWith(github.ref,'refs/tags/uat-')
     runs-on: ubuntu-latest
     steps:
@@ -123,7 +122,6 @@ jobs:
       id: branch
 
     - name: Extract image version
-      if: startsWith(github.ref,'refs/tags/uat-')
       run: |
         fullref=${{ github.event.ref }}
         version=${fullref:14}
@@ -138,7 +136,7 @@ jobs:
         repository: MyJetMarketingBox/marketing-box-kubernates-infrastructure
         ref: uat
         token: ${{ secrets.UAT_GIT_TOKEN }}
-    - run: ls
+    - run: echo $version
 #    - run: sed -i s/${{ steps.string.outputs.lowercase }}-uat:.*/${{ steps.string.outputs.lowercase }}-uat:${GITHUB_REF#refs/tags/}/g services/*/deployment*
     - run: sed -i s/${{ steps.string.outputs.lowercase }}-uat:.*/${{ steps.string.outputs.lowercase }}-uat:$version/g services/*/deployment*
     - run: |
