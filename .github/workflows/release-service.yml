@@ -17,6 +17,7 @@ jobs:
       id: branch
 
     - name: Extract image version
+      if: startsWith(github.ref,'refs/tags/uat-')
       run: |
         fullref=${{ github.event.ref }}
         version=${fullref:14}
