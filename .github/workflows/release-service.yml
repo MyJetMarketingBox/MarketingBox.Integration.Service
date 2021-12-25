@@ -92,6 +92,9 @@ jobs:
         fullref=${{ github.event.ref }}
         version=${fullref:10}
 
+    - name: Show version
+      run: echo $version
+
     - id: string
       uses: ASzc/change-string-case-action@v1
       with:
@@ -125,6 +128,10 @@ jobs:
       run: |
         fullref=${{ github.event.ref }}
         version=${fullref:14}
+
+    - name: Show version
+      run: echo $version
+
 
     - id: string
       uses: ASzc/change-string-case-action@v1
