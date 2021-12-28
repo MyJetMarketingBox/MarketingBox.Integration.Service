@@ -17,7 +17,7 @@ jobs:
         dotnet-version: 6.0.*
         source-url: https://nuget.pkg.github.com/myjetmarketingbox/index.json
       env:
-        NUGET_AUTH_TOKEN: ${{secrets.UAT_GIT_TOKEN}}  
+        NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}  
 
     - name: Build
       run: dotnet build --configuration Release /p:AssemblyVersion=${GITHUB_REF#refs/tags/client-}
@@ -37,5 +37,4 @@ jobs:
         nupkg-path:  './src/*${{ github.event.repository.name }}.Client/bin/Release/*.nupkg'
         repo-owner:  'myjetmarketingbox'
         gh-user:  ${{ github.actor }}
-        token:  ${{ secrets.UAT_GIT_TOKEN }}  
-
+        token:  ${{ secrets.GITHUB_TOKEN }} 
