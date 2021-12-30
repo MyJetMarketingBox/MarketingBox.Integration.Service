@@ -16,7 +16,7 @@ namespace MarketingBox.Integration.Service.Services
     public class DepositorsBackgroundService
     {
         private const int TimerSpan10Min = 10*60;
-        private const int TimerSpan30Sec = 30;
+        private const int TimerSpan60Sec = 60;
         private const int PageSize100 = 100;
         private const string StartFrom2021 = "2021-01-01";
         private readonly MyTaskTimer _operationsTimer;
@@ -33,7 +33,7 @@ namespace MarketingBox.Integration.Service.Services
         {
             _logger = logger;
             _depositRegistrationService = depositRegistrationService;
-            _operationsTimer = new MyTaskTimer(nameof(DepositorsBackgroundService), TimeSpan.FromSeconds(TimerSpan30Sec), logger, Process);
+            _operationsTimer = new MyTaskTimer(nameof(DepositorsBackgroundService), TimeSpan.FromSeconds(TimerSpan60Sec), logger, Process);
             _bridgeStorage = bridgeStorage;
             _repository = repository;
         }
