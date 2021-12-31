@@ -19,7 +19,7 @@ namespace MarketingBox.Integration.Service.Services
         private const int TimerSpan10Min = 10 * 60;
         private const int TimerSpan60Sec = 60;
         private const int PageSize100 = 100;
-        private const string StartFrom2021 = "2021-01-01";
+        private const string StartFrom2021 = "2021-11-01";
         private readonly MyTaskTimer _operationsTimer;
         private readonly ILogger<RegistrationsBackgroundService> _logger;
         private readonly ICrmService _crmRegistrationService;
@@ -50,10 +50,10 @@ namespace MarketingBox.Integration.Service.Services
 
         private async Task Process()
         {
-
             var bridges = _bridgeStorage.GetAll();
             foreach (var bridge in bridges)
             {
+                Console.WriteLine($"Bridge {bridge.Value.IntegrationName} start check customer statuses for {bridge.Value.TenantId}");
                 try
                 {
                     var potentionalCrmStatusUpdatersDb = await _repository.GetPotentionalDepositorsByBrandAsync(
@@ -109,6 +109,7 @@ namespace MarketingBox.Integration.Service.Services
                                 {
                                     continue;
                                 }
+                                Console.WriteLine($"Bridge {bridge.Value.IntegrationName} customer '{updateItem.CustomerId}' from {itemFromDb.Crm.ToString()} to {updateItem.Crm.ToString()}");
                                 itemFromDb.CrmUpdatedAt = updateItem.CrmUpdatedAt;
                                 itemFromDb.Crm = updateItem.Crm;
                                 itemFromDb.Sequence++;
@@ -131,6 +132,7 @@ namespace MarketingBox.Integration.Service.Services
                 {
                     _logger.LogError("RegistrationsBackgroundService exception {@Message}", e.Message);
                 }
+                Console.WriteLine($"Bridge {bridge.Value.IntegrationName} finished check customer statuses for {bridge.Value.TenantId}");
             }
         }
 
@@ -146,6 +148,7 @@ namespace MarketingBox.Integration.Service.Services
                 IntegrationName = message.IntegrationName,
                 RegistrationId = message.RegistrationId,
                 RegistrationUniqueId = message.RegistrationUniqueId,
+                TenantId = message.TenantId,
             };
         }
 
