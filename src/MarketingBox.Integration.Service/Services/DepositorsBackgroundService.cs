@@ -33,7 +33,7 @@ namespace MarketingBox.Integration.Service.Services
         {
             _logger = logger;
             _depositRegistrationService = depositRegistrationService;
-            _operationsTimer = new MyTaskTimer(nameof(DepositorsBackgroundService), TimeSpan.FromSeconds(TimerSpan60Sec), logger, Process);
+            _operationsTimer = new MyTaskTimer(nameof(DepositorsBackgroundService), TimeSpan.FromSeconds(TimerSpan10Min), logger, Process);
             _bridgeStorage = bridgeStorage;
             _repository = repository;
         }

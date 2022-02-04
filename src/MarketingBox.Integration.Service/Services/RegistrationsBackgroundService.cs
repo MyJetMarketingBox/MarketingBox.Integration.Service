@@ -34,7 +34,7 @@ namespace MarketingBox.Integration.Service.Services
         {
             _logger = logger;
             _crmRegistrationService = crmRegistrationService;
-            _operationsTimer = new MyTaskTimer(nameof(RegistrationsBackgroundService), TimeSpan.FromSeconds(TimerSpan60Sec), logger, Process);
+            _operationsTimer = new MyTaskTimer(nameof(RegistrationsBackgroundService), TimeSpan.FromSeconds(TimerSpan10Min), logger, Process);
             _bridgeStorage = bridgeStorage;
             _repository = repository;
         }
