@@ -52,6 +52,7 @@ namespace MarketingBox.Integration.Service.Services
             var bridges = _bridgeStorage.GetAll();
             foreach (var bridge in bridges)
             {
+                Console.WriteLine($"{DateTime.UtcNow}\tBridge {bridge.Value.IntegrationName} start check depositors statuses for {bridge.Value.TenantId}");
                 try
                 {
                     var potentionalDepositorsFromDb = await _repository.GetPotentionalDepositorsByBrandAsync(
@@ -60,6 +61,7 @@ namespace MarketingBox.Integration.Service.Services
                     // Nothing to find
                     if (potentionalDepositorsFromDb.Count == 0)
                     {
+                        Console.WriteLine($"{DateTime.UtcNow}\tBridge {bridge.Value.IntegrationName} finished check depositors statuses for {bridge.Value.TenantId} - no potentional depositors");
                         continue;
                     }
 
@@ -121,6 +123,7 @@ namespace MarketingBox.Integration.Service.Services
                 {
                     _logger.LogError("DepositorsBackgroundService exception {@Message}", e.Message);
                 }
+                Console.WriteLine($"{DateTime.UtcNow}\tBridge {bridge.Value.IntegrationName} finished check depositors statuses for {bridge.Value.TenantId}");
             }
         }
         private MarketingBox.Registration.Service.Grpc.Models.Deposits.Contracts.DepositCreateRequest MapToRequest(

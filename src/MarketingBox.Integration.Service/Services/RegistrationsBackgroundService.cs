@@ -53,7 +53,7 @@ namespace MarketingBox.Integration.Service.Services
             var bridges = _bridgeStorage.GetAll();
             foreach (var bridge in bridges)
             {
-                Console.WriteLine($"Bridge {bridge.Value.IntegrationName} start check customer statuses for {bridge.Value.TenantId}");
+                Console.WriteLine($"{DateTime.UtcNow}\tBridge {bridge.Value.IntegrationName} start check crm statuses for {bridge.Value.TenantId}");
                 try
                 {
                     var potentionalCrmStatusUpdatersDb = await _repository.GetPotentionalDepositorsByBrandAsync(
@@ -62,6 +62,7 @@ namespace MarketingBox.Integration.Service.Services
                     // Nothing to find
                     if (potentionalCrmStatusUpdatersDb.Count == 0)
                     {
+                        Console.WriteLine($"{DateTime.UtcNow}\tBridge {bridge.Value.IntegrationName} finished check crm statuses for {bridge.Value.TenantId} - no potentional customers");
                         continue;
                     }
 
@@ -132,7 +133,7 @@ namespace MarketingBox.Integration.Service.Services
                 {
                     _logger.LogError("RegistrationsBackgroundService exception {@Message}", e.Message);
                 }
-                Console.WriteLine($"Bridge {bridge.Value.IntegrationName} finished check customer statuses for {bridge.Value.TenantId}");
+                Console.WriteLine($"{DateTime.UtcNow}\tBridge {bridge.Value.IntegrationName} finished check crm statuses for {bridge.Value.TenantId}");
             }
         }
 
