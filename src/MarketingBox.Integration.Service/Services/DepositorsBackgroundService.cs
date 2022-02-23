@@ -80,16 +80,16 @@ namespace MarketingBox.Integration.Service.Services
                         do
                         {
                             var realDepositors = await bridge.Value.Service.GetDepositorsPerPeriodAsync(request);
-                            if (realDepositors.Items == null)
+                            if (realDepositors.Data == null)
                             {
                                 break;
                             }
                             // Update and notify only new potentional depositors
-                            var intersectList = realDepositors.Items
+                            var intersectList = realDepositors.Data
                                 .Select(a => a.CustomerId)
                                 .Intersect(potentionalDepositors.Select(b => b.CustomerId));
 
-                            var updateList = realDepositors.Items.Where(x => intersectList.Contains(x.CustomerId));
+                            var updateList = realDepositors.Data.Where(x => intersectList.Contains(x.CustomerId));
 
                             foreach (var updateItem in updateList)
                             {
@@ -110,7 +110,7 @@ namespace MarketingBox.Integration.Service.Services
                                 _logger.LogInformation("New depositor added {@Registration}", itemFromDb);
                             }
 
-                            count = realDepositors.Items.Count;
+                            count = realDepositors.Data.Count;
                             request.NextPage();
 
                         } while (count == request.PageSize);
@@ -124,7 +124,7 @@ namespace MarketingBox.Integration.Service.Services
             }
         }
         private MarketingBox.Registration.Service.Grpc.Models.Deposits.Contracts.DepositCreateRequest MapToRequest(
-            MarketingBox.Integration.Service.Grpc.Models.Registrations.DepositorReporting message,
+            DepositorReporting message,
             MarketingBox.Integration.Service.Storage.Bridge bridge)
         {
             return new MarketingBox.Registration.Service.Grpc.Models.Deposits.Contracts.DepositCreateRequest()

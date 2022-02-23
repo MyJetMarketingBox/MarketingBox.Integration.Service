@@ -2,6 +2,7 @@
 using System.ServiceModel;
 using System.Threading.Tasks;
 using MarketingBox.Integration.Service.Grpc.Models.Registrations.Contracts.Integration;
+using MarketingBox.Sdk.Common.Models.Grpc;
 
 namespace MarketingBox.Integration.Service.Client
 {
@@ -9,6 +10,6 @@ namespace MarketingBox.Integration.Service.Client
     public interface IIntegrationService
     {
         [OperationContract]
-        Task<RegistrationResponse> SendRegisterationAsync(RegistrationRequest request);
+        Task<Response<Registration>> SendRegisterationAsync(RegistrationRequest request);
     }
 }

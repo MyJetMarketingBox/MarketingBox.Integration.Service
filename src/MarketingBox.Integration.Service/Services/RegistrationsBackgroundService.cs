@@ -11,7 +11,6 @@ using MarketingBox.Registration.Service.Grpc;
 using Microsoft.Extensions.Logging;
 using MyJetWallet.Sdk.Service.Tools;
 
-
 namespace MarketingBox.Integration.Service.Services
 {
     public class RegistrationsBackgroundService
@@ -85,16 +84,16 @@ namespace MarketingBox.Integration.Service.Services
                         do
                         {
                             var realCrmStatusUpdaters = await bridge.Value.Service.GetRegistrationsPerPeriodAsync(request);
-                            if (realCrmStatusUpdaters.Items == null)
+                            if (realCrmStatusUpdaters.Data == null)
                             {
                                 break;
                             }
                             // Notify only new crm updates
-                            var intersectList = realCrmStatusUpdaters.Items
+                            var intersectList = realCrmStatusUpdaters.Data
                                 .Select(a => a.CustomerId)
                                 .Intersect(potentionalCrmStatusUpdaters.Select(b => b.CustomerId));
 
-                            var updateList = realCrmStatusUpdaters.Items.Where(x => intersectList.Contains(x.CustomerId));
+                            var updateList = realCrmStatusUpdaters.Data.Where(x => intersectList.Contains(x.CustomerId));
 
                             foreach (var updateItem in updateList)
                             {
@@ -121,7 +120,7 @@ namespace MarketingBox.Integration.Service.Services
                                 _logger.LogInformation("New crm status {@Registration}", itemFromDb);
                             }
 
-                            count = realCrmStatusUpdaters.Items.Count;
+                            count = realCrmStatusUpdaters.Data.Count;
                             request.NextPage();
 
                         } while (count == request.PageSize);
