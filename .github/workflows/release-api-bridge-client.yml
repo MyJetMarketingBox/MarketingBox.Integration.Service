@@ -20,7 +20,7 @@ jobs:
         NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}  
 
     - name: Build
-      run: dotnet build --configuration Release /p:AssemblyVersion=${GITHUB_REF#refs/tags/client-}
+      run: dotnet build --configuration Release /p:AssemblyVersion=${GITHUB_REF#refs/tags/bridge-}
 
     - name: Test
       run: dotnet test --no-build --configuration Release
