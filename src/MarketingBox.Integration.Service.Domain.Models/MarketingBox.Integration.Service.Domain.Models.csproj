@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="MyJetWallet.Sdk.Service" Version="1.6.11" />
+    <PackageReference Include="MyJetWallet.Sdk.Service" Version="2.1.7" />
   </ItemGroup>
 
 </Project>
