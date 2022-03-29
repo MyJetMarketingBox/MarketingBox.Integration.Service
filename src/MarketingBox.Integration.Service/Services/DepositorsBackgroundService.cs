@@ -7,6 +7,7 @@ using MarketingBox.Integration.Service.Grpc.Models.Registrations;
 using MarketingBox.Integration.Service.Grpc.Models.Registrations.Contracts.Bridge;
 using MarketingBox.Integration.Service.Storage;
 using MarketingBox.Registration.Service.Grpc;
+using MarketingBox.Registration.Service.Grpc.Requests.Deposits;
 using Microsoft.Extensions.Logging;
 using MyJetWallet.Sdk.Service.Tools;
 
@@ -123,18 +124,14 @@ namespace MarketingBox.Integration.Service.Services
                 }
             }
         }
-        private MarketingBox.Registration.Service.Grpc.Models.Deposits.Contracts.DepositCreateRequest MapToRequest(
+        private DepositCreateRequest MapToRequest(
             DepositorReporting message,
             MarketingBox.Integration.Service.Storage.Bridge bridge)
         {
-            return new MarketingBox.Registration.Service.Grpc.Models.Deposits.Contracts.DepositCreateRequest()
+            return new DepositCreateRequest()
             {
                 CustomerId = message.CustomerId,
-                Email = message.CustomerEmail,
-                BrandName = bridge.IntegrationName,
-                BrandId = bridge.IntegrationId,
                 TenantId = bridge.TenantId,
-                CreatedAt = DateTime.UtcNow,
             };
         }
     }

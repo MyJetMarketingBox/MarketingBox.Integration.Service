@@ -2,14 +2,17 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using MarketingBox.Integration.Service.Domain.Extensions;
+using MarketingBox.Integration.Service.Domain.Registrations;
 using MarketingBox.Integration.Service.Domain.Repositories;
 using MarketingBox.Integration.Service.Domain.Utils;
 using MarketingBox.Integration.Service.Grpc.Models.Registrations;
 using MarketingBox.Integration.Service.Grpc.Models.Registrations.Contracts.Bridge;
 using MarketingBox.Integration.Service.Storage;
 using MarketingBox.Registration.Service.Grpc;
+using MarketingBox.Registration.Service.Grpc.Requests.Crm;
 using Microsoft.Extensions.Logging;
 using MyJetWallet.Sdk.Service.Tools;
+using CrmStatus = MarketingBox.Registration.Service.Domain.Models.Common.CrmStatus;
 
 namespace MarketingBox.Integration.Service.Services
 {
@@ -135,18 +138,13 @@ namespace MarketingBox.Integration.Service.Services
             }
         }
 
-        private MarketingBox.Registration.Service.Grpc.Models.Crm.UpdateCrmStatusRequest MapToRequest(
-            MarketingBox.Integration.Service.Domain.Registrations.RegistrationLog message)
+        private UpdateCrmStatusRequest MapToRequest(
+            RegistrationLog message)
         {
-            return new MarketingBox.Registration.Service.Grpc.Models.Crm.UpdateCrmStatusRequest()
+            return new UpdateCrmStatusRequest()
             {
                 CustomerId = message.CustomerId,
-                Crm = message.Crm.MapEnum<Registration.Service.Domain.Crm.CrmStatus>(),  
-                CrmUpdatedAt = message.CrmUpdatedAt,
-                IntegrationId = message.IntegrationId,
-                IntegrationName = message.IntegrationName,
-                RegistrationId = message.RegistrationId,
-                RegistrationUniqueId = message.RegistrationUniqueId,
+                Crm =  message.Crm.MapEnum<CrmStatus>(),
                 TenantId = message.TenantId,
             };
         }
