@@ -7,6 +7,7 @@ using MarketingBox.Integration.Service.Grpc.Models.Registrations;
 using MarketingBox.Integration.Service.Grpc.Models.Registrations.Contracts.Bridge;
 using MarketingBox.Integration.Service.Storage;
 using MarketingBox.Registration.Service.Grpc;
+using MarketingBox.Registration.Service.Grpc.Requests.Deposits;
 using Microsoft.Extensions.Logging;
 using MyJetWallet.Sdk.Service.Tools;
 
@@ -16,7 +17,7 @@ namespace MarketingBox.Integration.Service.Services
     public class DepositorsBackgroundService
     {
         private const int TimerSpan10Min = 10*60;
-        private const int TimerSpan30Sec = 30;
+        private const int TimerSpan60Sec = 60;
         private const int PageSize100 = 100;
         private const string StartFrom2021 = "2021-01-01";
         private readonly MyTaskTimer _operationsTimer;
@@ -33,7 +34,7 @@ namespace MarketingBox.Integration.Service.Services
         {
             _logger = logger;
             _depositRegistrationService = depositRegistrationService;
-            _operationsTimer = new MyTaskTimer(nameof(DepositorsBackgroundService), TimeSpan.FromSeconds(TimerSpan30Sec), logger, Process);
+            _operationsTimer = new MyTaskTimer(nameof(DepositorsBackgroundService), TimeSpan.FromSeconds(TimerSpan60Sec), logger, Process);
             _bridgeStorage = bridgeStorage;
             _repository = repository;
         }
@@ -80,16 +81,16 @@ namespace MarketingBox.Integration.Service.Services
                         do
                         {
                             var realDepositors = await bridge.Value.Service.GetDepositorsPerPeriodAsync(request);
-                            if (realDepositors.Items == null)
+                            if (realDepositors.Data == null)
                             {
                                 break;
                             }
                             // Update and notify only new potentional depositors
-                            var intersectList = realDepositors.Items
+                            var intersectList = realDepositors.Data
                                 .Select(a => a.CustomerId)
                                 .Intersect(potentionalDepositors.Select(b => b.CustomerId));
 
-                            var updateList = realDepositors.Items.Where(x => intersectList.Contains(x.CustomerId));
+                            var updateList = realDepositors.Data.Where(x => intersectList.Contains(x.CustomerId));
 
                             foreach (var updateItem in updateList)
                             {
@@ -110,7 +111,7 @@ namespace MarketingBox.Integration.Service.Services
                                 _logger.LogInformation("New depositor added {@Registration}", itemFromDb);
                             }
 
-                            count = realDepositors.Items.Count;
+                            count = realDepositors.Data.Count;
                             request.NextPage();
 
                         } while (count == request.PageSize);
@@ -123,18 +124,14 @@ namespace MarketingBox.Integration.Service.Services
                 }
             }
         }
-        private MarketingBox.Registration.Service.Grpc.Models.Deposits.Contracts.DepositCreateRequest MapToRequest(
-            MarketingBox.Integration.Service.Grpc.Models.Registrations.DepositorReporting message,
+        private DepositCreateRequest MapToRequest(
+            DepositorReporting message,
             MarketingBox.Integration.Service.Storage.Bridge bridge)
         {
-            return new MarketingBox.Registration.Service.Grpc.Models.Deposits.Contracts.DepositCreateRequest()
+            return new DepositCreateRequest()
             {
                 CustomerId = message.CustomerId,
-                Email = message.CustomerEmail,
-                BrandName = bridge.IntegrationName,
-                BrandId = bridge.IntegrationId,
                 TenantId = bridge.TenantId,
-                CreatedAt = DateTime.UtcNow,
             };
         }
     }

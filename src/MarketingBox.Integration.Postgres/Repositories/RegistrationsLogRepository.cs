@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Dapper;
 using System.Linq;
 using MarketingBox.Integration.Postgres.Entities;
+using MarketingBox.Sdk.Common.Exceptions;
 
 namespace MarketingBox.Integration.Postgres.Repositories
 {
@@ -29,7 +30,7 @@ namespace MarketingBox.Integration.Postgres.Repositories
 
             if (registrationLog == null)
             {
-                throw new Exception($"Registration with customerId {customerId} can't be found");
+                throw new NotFoundException($"Registration with {nameof(customerId)}", customerId);
             }
 
             return registrationLog.CreateRegistrationLog();
@@ -72,7 +73,14 @@ namespace MarketingBox.Integration.Postgres.Repositories
                         IntegrationId = integrationId
                     });
 
-                var response = array
+                var registrationLogEntities = array.ToList();
+                
+                if (!registrationLogEntities.Any())
+                {
+                    throw new NotFoundException(NotFoundException.DefaultMessage);
+                }
+                
+                var response = registrationLogEntities
                     .Select(registration => registration.CreateRegistrationLog())
                     .ToList();
 
@@ -113,7 +121,13 @@ namespace MarketingBox.Integration.Postgres.Repositories
                         TenantId = tenantId,
                     });
 
-                var response = array
+                var registrationLogEntities = array.ToList();
+                
+                if (!registrationLogEntities.Any())
+                {
+                    throw new NotFoundException(NotFoundException.DefaultMessage);
+                }
+                var response = registrationLogEntities
                     .Select(registration => registration.CreateRegistrationLog())
                     .ToList();
 
@@ -131,7 +145,7 @@ namespace MarketingBox.Integration.Postgres.Repositories
 
             if (rowsCount == 0)
             {
-                throw new Exception($"Registration {registration.RegistrationId} already updated, try to use most recent version");
+                throw new AlreadyExistsException($"Registration {registration.RegistrationId} already updated, try to use most recent version");
             }
         }
     }
