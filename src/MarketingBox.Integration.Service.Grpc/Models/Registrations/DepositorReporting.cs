@@ -9,7 +9,7 @@ namespace MarketingBox.Integration.Service.Grpc.Models.Registrations
     public class DepositorReporting
     {
         [DataMember(Order = 1)]
-        public string CustomerId { get; set; }
+        public long RegistrationId { get; set; }
 
         [DataMember(Order = 2)]
         [LogMasked(PreserveLength = true, ShowFirst = 2, ShowLast = 2)]

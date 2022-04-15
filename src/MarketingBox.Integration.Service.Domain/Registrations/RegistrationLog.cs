@@ -1,5 +1,6 @@
 ﻿using Destructurama.Attributed;
 using System;
+using MarketingBox.Sdk.Common.Enums;
 
 namespace MarketingBox.Integration.Service.Domain.Registrations
 {

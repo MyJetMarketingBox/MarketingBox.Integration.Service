@@ -21,7 +21,7 @@ namespace MarketingBox.Integration.Postgres.Repositories
             _dbContextOptionsBuilder = dbContextOptionsBuilder;
         }
 
-        public async Task<Service.Domain.Registrations.RegistrationLog> GetByCustomerIdAsync(
+        public async Task<RegistrationLog> GetByCustomerIdAsync(
             string tenantId, string customerId)
         {
             using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);

@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using MarketingBox.Integration.Service.Domain.Extensions;
 using MarketingBox.Integration.Service.Domain.Registrations;
 using MarketingBox.Integration.Service.Domain.Repositories;
 using MarketingBox.Integration.Service.Domain.Utils;
@@ -12,7 +11,6 @@ using MarketingBox.Registration.Service.Grpc;
 using MarketingBox.Registration.Service.Grpc.Requests.Crm;
 using Microsoft.Extensions.Logging;
 using MyJetWallet.Sdk.Service.Tools;
-using CrmStatus = MarketingBox.Registration.Service.Domain.Models.Common.CrmStatus;
 
 namespace MarketingBox.Integration.Service.Services
 {
@@ -143,8 +141,8 @@ namespace MarketingBox.Integration.Service.Services
         {
             return new UpdateCrmStatusRequest()
             {
-                CustomerId = message.CustomerId,
-                Crm =  message.Crm.MapEnum<CrmStatus>(),
+                RegistrationId = message.RegistrationId,
+                Crm =  message.Crm,
                 TenantId = message.TenantId,
             };
         }

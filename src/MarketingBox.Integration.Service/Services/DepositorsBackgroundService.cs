@@ -68,7 +68,7 @@ namespace MarketingBox.Integration.Service.Services
                         .Select(i => new DepositorReporting
                         {
                             CustomerEmail = i.CustomerEmail,
-                            CustomerId = i.CustomerId,
+                            RegistrationId = i.RegistrationId,
                             DepositedAt = i.DepositedAt
                         });
 
@@ -87,14 +87,14 @@ namespace MarketingBox.Integration.Service.Services
                             }
                             // Update and notify only new potentional depositors
                             var intersectList = realDepositors.Data
-                                .Select(a => a.CustomerId)
-                                .Intersect(potentionalDepositors.Select(b => b.CustomerId));
+                                .Select(a => a.RegistrationId)
+                                .Intersect(potentionalDepositors.Select(b => b.RegistrationId));
 
-                            var updateList = realDepositors.Data.Where(x => intersectList.Contains(x.CustomerId));
+                            var updateList = realDepositors.Data.Where(x => intersectList.Contains(x.RegistrationId));
 
                             foreach (var updateItem in updateList)
                             {
-                                var itemFromDb = potentionalDepositorsFromDb.FirstOrDefault(x => x.CustomerId.Equals(updateItem.CustomerId));
+                                var itemFromDb = potentionalDepositorsFromDb.FirstOrDefault(x => x.CustomerId.Equals(updateItem.RegistrationId));
                                 if (itemFromDb == null)
                                 {
                                     _logger.LogWarning("Can't find depositor in db {@Registration}", updateItem);
@@ -130,7 +130,7 @@ namespace MarketingBox.Integration.Service.Services
         {
             return new DepositCreateRequest()
             {
-                CustomerId = message.CustomerId,
+                RegistrationId = message.RegistrationId,
                 TenantId = bridge.TenantId,
             };
         }

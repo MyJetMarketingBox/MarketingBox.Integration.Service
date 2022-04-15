@@ -2,6 +2,7 @@
 using MarketingBox.Integration.Service.Domain.Registrations;
 using System;
 using System.Runtime.Serialization;
+using MarketingBox.Sdk.Common.Enums;
 
 namespace MarketingBox.Integration.Service.Grpc.Models.Registrations
 {
