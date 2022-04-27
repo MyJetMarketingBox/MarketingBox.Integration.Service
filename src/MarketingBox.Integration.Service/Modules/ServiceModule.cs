@@ -29,8 +29,7 @@ namespace MarketingBox.Integration.Service.Modules
                     IntegrationName = bridgeSettings.IntegrationName,
                     TenantId = bridgeSettings.TenantId,
                     Service = new BridgeServiceClientFactory(bridgeSettings.Url).GetBridgeService()
-                }
-                );
+                });
             }
 
             return bridges;
