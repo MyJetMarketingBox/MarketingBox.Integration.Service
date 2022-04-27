@@ -70,7 +70,7 @@ namespace MarketingBox.Integration.Service.Services
                 if (bridge == null)
                 {
                     _logger.LogWarning("Can't find bridge for integration {@context}", request);
-                    throw new NotFoundException($"Bridge for {nameof(request.IntegrationName)} {request.IntegrationName}", request.IntegrationId);
+                    throw new NotFoundException("Bridge for integration with id", request.IntegrationId);
                 }
 
                 var customerInfo = await bridge.Service.SendRegistrationAsync(registration);
