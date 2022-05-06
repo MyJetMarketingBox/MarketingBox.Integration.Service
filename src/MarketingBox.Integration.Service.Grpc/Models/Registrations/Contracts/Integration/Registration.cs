@@ -1,5 +1,4 @@
 ﻿using System.Runtime.Serialization;
-using MarketingBox.Integration.Service.Grpc.Models.Common;
 
 namespace MarketingBox.Integration.Service.Grpc.Models.Registrations.Contracts.Integration
 {
