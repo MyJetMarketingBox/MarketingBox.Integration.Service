@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using MarketingBox.Integration.Service.Domain.Registrations;
 using MarketingBox.Integration.Service.Domain.Repositories;
 using MarketingBox.Integration.Service.Domain.Utils;
 using MarketingBox.Integration.Service.Grpc.Models.Registrations;
@@ -68,7 +69,7 @@ namespace MarketingBox.Integration.Service.Services
                         .Select(i => new DepositorReporting
                         {
                             CustomerEmail = i.CustomerEmail,
-                            RegistrationId = i.RegistrationId,
+                            CustomerId = i.CustomerId,
                             DepositedAt = i.DepositedAt
                         });
 
@@ -87,14 +88,14 @@ namespace MarketingBox.Integration.Service.Services
                             }
                             // Update and notify only new potentional depositors
                             var intersectList = realDepositors.Data
-                                .Select(a => a.RegistrationId)
-                                .Intersect(potentionalDepositors.Select(b => b.RegistrationId));
+                                .Select(a => a.CustomerId)
+                                .Intersect(potentionalDepositors.Select(b => b.CustomerId));
 
-                            var updateList = realDepositors.Data.Where(x => intersectList.Contains(x.RegistrationId));
+                            var updateList = realDepositors.Data.Where(x => intersectList.Contains(x.CustomerId));
 
                             foreach (var updateItem in updateList)
                             {
-                                var itemFromDb = potentionalDepositorsFromDb.FirstOrDefault(x => x.CustomerId.Equals(updateItem.RegistrationId));
+                                var itemFromDb = potentionalDepositorsFromDb.FirstOrDefault(x => x.CustomerId.Equals(updateItem.CustomerId));
                                 if (itemFromDb == null)
                                 {
                                     _logger.LogWarning("Can't find depositor in db {@Registration}", updateItem);
@@ -107,7 +108,7 @@ namespace MarketingBox.Integration.Service.Services
                                 await _repository.SaveAsync(itemFromDb);
 
                                 var storeResponse = await _depositRegistrationService.RegisterDepositAsync(
-                                    MapToRequest(updateItem, bridge.Value));
+                                    MapToRequest(itemFromDb));
                                 _logger.LogInformation("New depositor added {@Registration}", itemFromDb);
                             }
 
@@ -125,13 +126,12 @@ namespace MarketingBox.Integration.Service.Services
             }
         }
         private DepositCreateRequest MapToRequest(
-            DepositorReporting message,
-            MarketingBox.Integration.Service.Storage.Bridge bridge)
+            RegistrationLog message)
         {
             return new DepositCreateRequest()
             {
                 RegistrationId = message.RegistrationId,
-                TenantId = bridge.TenantId,
+                TenantId = message.TenantId,
             };
         }
     }
