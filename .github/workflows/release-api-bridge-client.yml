@@ -20,13 +20,13 @@ jobs:
         NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}  
 
     - name: Build
-      run: dotnet build --configuration Release /p:AssemblyVersion=${GITHUB_REF#refs/tags/client-}
+      run: dotnet build --configuration Release /p:AssemblyVersion=${GITHUB_REF#refs/tags/bridge-}
 
     - name: Test
       run: dotnet test --no-build --configuration Release
 
     - name: Create the package
-      run: dotnet pack --configuration Release src/*${{ github.event.repository.name }}.Bridge.Client /p:Version=${GITHUB_REF#refs/tags/client-}
+      run: dotnet pack --configuration Release src/*${{ github.event.repository.name }}.Bridge.Client /p:Version=${GITHUB_REF#refs/tags/bridge-}
 
     - name: Publish the package to GPR
       run: dotnet nuget push src/*${{ github.event.repository.name }}.Bridge.Client/bin/Release/*.nupkg -s "https://api.nuget.org/v3/index.json" -k ${{ secrets.NUGET_TOCKEN }}
