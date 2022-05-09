@@ -1,6 +1,9 @@
-﻿using System.ServiceModel;
+﻿using System.Collections.Generic;
+using System.ServiceModel;
 using System.Threading.Tasks;
+using MarketingBox.Integration.Service.Grpc.Models.Registrations;
 using MarketingBox.Integration.Service.Grpc.Models.Registrations.Contracts.Bridge;
+using MarketingBox.Sdk.Common.Models.Grpc;
 
 namespace MarketingBox.Integration.Bridge.Client
 {
@@ -8,12 +11,12 @@ namespace MarketingBox.Integration.Bridge.Client
     public interface IBridgeService
     {
         [OperationContract]
-        Task<RegistrationResponse> SendRegistrationAsync(RegistrationRequest request);
+        Task<Response<CustomerInfo>> SendRegistrationAsync(RegistrationRequest request);
         
         [OperationContract]
-        Task<RegistrationsReportingResponse> GetRegistrationsPerPeriodAsync(ReportingRequest request);
+        Task<Response<IReadOnlyCollection<RegistrationReporting>>> GetRegistrationsPerPeriodAsync(ReportingRequest request);
 
         [OperationContract]
-        Task<DepositorsReportingResponse> GetDepositorsPerPeriodAsync(ReportingRequest request);
+        Task<Response<IReadOnlyCollection<DepositorReporting>>> GetDepositorsPerPeriodAsync(ReportingRequest request);
     }
 }

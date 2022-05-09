@@ -10,7 +10,7 @@ namespace MarketingBox.Integration.Service.Modules
     {
         protected override void Load(ContainerBuilder builder)
         {
-            builder.RegisterInstance<BridgeStorage>(new BridgeStorage(GetBridges()));
+            builder.RegisterInstance(new BridgeStorage(GetBridges()));
             builder.RegisterRegistrationServiceClient(Program.Settings.RegistrationServiceUrl);
             builder.RegisterType<DepositorsBackgroundService>().SingleInstance().AutoActivate().AsSelf();
             builder.RegisterType<RegistrationsBackgroundService>().SingleInstance().AutoActivate().AsSelf();
@@ -18,7 +18,8 @@ namespace MarketingBox.Integration.Service.Modules
 
         private static (long, MarketingBox.Integration.Service.Storage.Bridge)[] GetBridges()
         {
-            var bridges = new (long, MarketingBox.Integration.Service.Storage.Bridge)[Program.Settings.GetBridges().Count];
+            var bridges =
+                new (long, MarketingBox.Integration.Service.Storage.Bridge)[Program.Settings.GetBridges().Count];
 
             for (int i = 0; i < Program.Settings.GetBridges().Count; i++)
             {
@@ -29,8 +30,7 @@ namespace MarketingBox.Integration.Service.Modules
                     IntegrationName = bridgeSettings.IntegrationName,
                     TenantId = bridgeSettings.TenantId,
                     Service = new BridgeServiceClientFactory(bridgeSettings.Url).GetBridgeService()
-                }
-                );
+                });
             }
 
             return bridges;

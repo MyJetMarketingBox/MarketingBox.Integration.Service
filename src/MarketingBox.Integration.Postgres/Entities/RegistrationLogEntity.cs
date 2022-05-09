@@ -1,6 +1,7 @@
 ﻿using System;
 using Destructurama.Attributed;
 using MarketingBox.Integration.Service.Domain.Registrations;
+using MarketingBox.Sdk.Common.Enums;
 
 namespace MarketingBox.Integration.Postgres.Entities
 {
