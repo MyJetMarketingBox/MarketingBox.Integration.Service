@@ -112,7 +112,6 @@ namespace MarketingBox.Integration.Service.Services
                                 Console.WriteLine($"Bridge {bridge.Value.IntegrationName} customer '{updateItem.CustomerId}' from {itemFromDb.Crm.ToString()} to {updateItem.Crm.ToString()}");
                                 itemFromDb.CrmUpdatedAt = updateItem.CrmUpdatedAt;
                                 itemFromDb.Crm = updateItem.Crm;
-                                itemFromDb.Sequence++;
                                 await _repository.SaveAsync(itemFromDb);
 
                                 // TODO Add new method for crm update

@@ -58,8 +58,7 @@ namespace MarketingBox.Integration.Postgres.Repositories
             r.""Crm"",
             r.""CrmUpdatedAt"", 
             r.""IntegrationName"",
-            r.""IntegrationId"",
-            r.""Sequence""
+            r.""IntegrationId""
             FROM ""integration-service"".registrationslogs AS r
             WHERE r.""TenantId"" = @TenantId AND r.""IntegrationId"" = @IntegrationId AND r.""Depositor"" = {depositor}
             ORDER BY r.""RegistrationId"" ASC";
@@ -106,8 +105,7 @@ namespace MarketingBox.Integration.Postgres.Repositories
             r.""Crm"",
             r.""CrmUpdatedAt"", 
             r.""IntegrationName"",
-            r.""IntegrationId"",
-            r.""Sequence""
+            r.""IntegrationId""
             FROM ""integration-service"".registrationslogs AS r
             WHERE r.""TenantId"" = @TenantId AND r.""Depositor"" = false
             {where}
@@ -140,7 +138,6 @@ namespace MarketingBox.Integration.Postgres.Repositories
             var entity = registration.CreateRegistrationLogEntity();
             var rowsCount = await ctx.RegistrationsLog.Upsert(entity)
                 .AllowIdentityMatch()
-                .UpdateIf(prev => prev.Sequence < entity.Sequence)
                 .RunAsync();
 
             if (rowsCount == 0)

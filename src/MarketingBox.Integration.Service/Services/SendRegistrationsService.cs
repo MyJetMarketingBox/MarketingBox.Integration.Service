@@ -94,8 +94,7 @@ namespace MarketingBox.Integration.Service.Services
                         Crm = CrmStatus.New,
                         CrmUpdatedAt = dt,
                         IntegrationName = request.IntegrationName,
-                        IntegrationId = request.IntegrationId,
-                        Sequence = 0
+                        IntegrationId = request.IntegrationId
                     });
                 }
 

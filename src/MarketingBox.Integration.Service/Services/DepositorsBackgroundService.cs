@@ -104,7 +104,6 @@ namespace MarketingBox.Integration.Service.Services
 
                                 itemFromDb.Depositor = true;
                                 itemFromDb.DepositedAt = updateItem.DepositedAt;
-                                itemFromDb.Sequence++;
                                 await _repository.SaveAsync(itemFromDb);
 
                                 var storeResponse = await _depositRegistrationService.RegisterDepositAsync(
