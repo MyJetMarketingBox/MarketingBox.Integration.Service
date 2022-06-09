@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Dapper;
 using System.Linq;
 using MarketingBox.Integration.Postgres.Entities;
+using MarketingBox.Sdk.Common.Exceptions;
 
 namespace MarketingBox.Integration.Postgres.Repositories
 {
@@ -20,7 +21,7 @@ namespace MarketingBox.Integration.Postgres.Repositories
             _dbContextOptionsBuilder = dbContextOptionsBuilder;
         }
 
-        public async Task<Service.Domain.Registrations.RegistrationLog> GetByCustomerIdAsync(
+        public async Task<RegistrationLog> GetByCustomerIdAsync(
             string tenantId, string customerId)
         {
             using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
@@ -29,7 +30,7 @@ namespace MarketingBox.Integration.Postgres.Repositories
 
             if (registrationLog == null)
             {
-                throw new Exception($"Registration with customerId {customerId} can't be found");
+                throw new NotFoundException($"Registration with {nameof(customerId)}", customerId);
             }
 
             return registrationLog.CreateRegistrationLog();
@@ -57,8 +58,7 @@ namespace MarketingBox.Integration.Postgres.Repositories
             r.""Crm"",
             r.""CrmUpdatedAt"", 
             r.""IntegrationName"",
-            r.""IntegrationId"",
-            r.""Sequence""
+            r.""IntegrationId""
             FROM ""integration-service"".registrationslogs AS r
             WHERE r.""TenantId"" = @TenantId AND r.""IntegrationId"" = @IntegrationId AND r.""Depositor"" = {depositor}
             ORDER BY r.""RegistrationId"" ASC";
@@ -72,7 +72,14 @@ namespace MarketingBox.Integration.Postgres.Repositories
                         IntegrationId = integrationId
                     });
 
-                var response = array
+                var registrationLogEntities = array.ToList();
+                
+                if (!registrationLogEntities.Any())
+                {
+                    throw new NotFoundException(NotFoundException.DefaultMessage);
+                }
+                
+                var response = registrationLogEntities
                     .Select(registration => registration.CreateRegistrationLog())
                     .ToList();
 
@@ -98,8 +105,7 @@ namespace MarketingBox.Integration.Postgres.Repositories
             r.""Crm"",
             r.""CrmUpdatedAt"", 
             r.""IntegrationName"",
-            r.""IntegrationId"",
-            r.""Sequence""
+            r.""IntegrationId""
             FROM ""integration-service"".registrationslogs AS r
             WHERE r.""TenantId"" = @TenantId AND r.""Depositor"" = false
             {where}
@@ -113,7 +119,13 @@ namespace MarketingBox.Integration.Postgres.Repositories
                         TenantId = tenantId,
                     });
 
-                var response = array
+                var registrationLogEntities = array.ToList();
+                
+                if (!registrationLogEntities.Any())
+                {
+                    throw new NotFoundException(NotFoundException.DefaultMessage);
+                }
+                var response = registrationLogEntities
                     .Select(registration => registration.CreateRegistrationLog())
                     .ToList();
 
@@ -126,12 +138,11 @@ namespace MarketingBox.Integration.Postgres.Repositories
             var entity = registration.CreateRegistrationLogEntity();
             var rowsCount = await ctx.RegistrationsLog.Upsert(entity)
                 .AllowIdentityMatch()
-                .UpdateIf(prev => prev.Sequence < entity.Sequence)
                 .RunAsync();
 
             if (rowsCount == 0)
             {
-                throw new Exception($"Registration {registration.RegistrationId} already updated, try to use most recent version");
+                throw new AlreadyExistsException($"Registration {registration.RegistrationId} already updated, try to use most recent version");
             }
         }
     }

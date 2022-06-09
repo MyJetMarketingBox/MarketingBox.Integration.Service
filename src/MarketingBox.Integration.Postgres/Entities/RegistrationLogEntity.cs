@@ -1,6 +1,7 @@
 ﻿using System;
 using Destructurama.Attributed;
 using MarketingBox.Integration.Service.Domain.Registrations;
+using MarketingBox.Sdk.Common.Enums;
 
 namespace MarketingBox.Integration.Postgres.Entities
 {
@@ -21,6 +22,5 @@ namespace MarketingBox.Integration.Postgres.Entities
         public DateTime CrmUpdatedAt { get; set; }
         public string IntegrationName { get; set; }
         public long IntegrationId { get; set; }
-        public long Sequence { get; set; }
     }
 }

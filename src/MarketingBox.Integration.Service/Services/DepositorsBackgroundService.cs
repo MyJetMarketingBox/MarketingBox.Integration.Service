@@ -1,12 +1,14 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using MarketingBox.Integration.Service.Domain.Registrations;
 using MarketingBox.Integration.Service.Domain.Repositories;
 using MarketingBox.Integration.Service.Domain.Utils;
 using MarketingBox.Integration.Service.Grpc.Models.Registrations;
 using MarketingBox.Integration.Service.Grpc.Models.Registrations.Contracts.Bridge;
 using MarketingBox.Integration.Service.Storage;
 using MarketingBox.Registration.Service.Grpc;
+using MarketingBox.Registration.Service.Grpc.Requests.Deposits;
 using Microsoft.Extensions.Logging;
 using MyJetWallet.Sdk.Service.Tools;
 
@@ -82,16 +84,16 @@ namespace MarketingBox.Integration.Service.Services
                         do
                         {
                             var realDepositors = await bridge.Value.Service.GetDepositorsPerPeriodAsync(request);
-                            if (realDepositors.Items == null)
+                            if (realDepositors.Data == null)
                             {
                                 break;
                             }
                             // Update and notify only new potentional depositors
-                            var intersectList = realDepositors.Items
+                            var intersectList = realDepositors.Data
                                 .Select(a => a.CustomerId)
                                 .Intersect(potentionalDepositors.Select(b => b.CustomerId));
 
-                            var updateList = realDepositors.Items.Where(x => intersectList.Contains(x.CustomerId));
+                            var updateList = realDepositors.Data.Where(x => intersectList.Contains(x.CustomerId));
 
                             foreach (var updateItem in updateList)
                             {
@@ -104,15 +106,14 @@ namespace MarketingBox.Integration.Service.Services
 
                                 itemFromDb.Depositor = true;
                                 itemFromDb.DepositedAt = updateItem.DepositedAt;
-                                itemFromDb.Sequence++;
                                 await _repository.SaveAsync(itemFromDb);
 
                                 var storeResponse = await _depositRegistrationService.RegisterDepositAsync(
-                                    MapToRequest(updateItem, bridge.Value));
+                                    MapToRequest(itemFromDb));
                                 _logger.LogInformation("New depositor added {@Registration}", itemFromDb);
                             }
 
-                            count = realDepositors.Items.Count;
+                            count = realDepositors.Data.Count;
                             request.NextPage();
 
                         } while (count == request.PageSize);
@@ -126,18 +127,13 @@ namespace MarketingBox.Integration.Service.Services
                 Console.WriteLine($"{DateTime.UtcNow}\tBridge {bridge.Value.IntegrationName} finished check depositors statuses for {bridge.Value.TenantId}");
             }
         }
-        private MarketingBox.Registration.Service.Grpc.Models.Deposits.Contracts.DepositCreateRequest MapToRequest(
-            MarketingBox.Integration.Service.Grpc.Models.Registrations.DepositorReporting message,
-            MarketingBox.Integration.Service.Storage.Bridge bridge)
+        private DepositCreateRequest MapToRequest(
+            RegistrationLog message)
         {
-            return new MarketingBox.Registration.Service.Grpc.Models.Deposits.Contracts.DepositCreateRequest()
+            return new DepositCreateRequest()
             {
-                CustomerId = message.CustomerId,
-                Email = message.CustomerEmail,
-                BrandName = bridge.IntegrationName,
-                BrandId = bridge.IntegrationId,
-                TenantId = bridge.TenantId,
-                CreatedAt = DateTime.UtcNow,
+                RegistrationId = message.RegistrationId,
+                TenantId = message.TenantId,
             };
         }
     }

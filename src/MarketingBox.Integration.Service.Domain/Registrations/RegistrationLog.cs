@@ -1,5 +1,6 @@
 ﻿using Destructurama.Attributed;
 using System;
+using MarketingBox.Sdk.Common.Enums;
 
 namespace MarketingBox.Integration.Service.Domain.Registrations
 {
@@ -20,6 +21,5 @@ namespace MarketingBox.Integration.Service.Domain.Registrations
         public DateTime CrmUpdatedAt { get; set; }
         public string IntegrationName { get; set; }
         public long IntegrationId { get; set; }
-        public long Sequence { get; set; }
     }
 }

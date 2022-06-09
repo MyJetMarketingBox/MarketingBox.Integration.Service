@@ -22,8 +22,7 @@ namespace MarketingBox.Integration.Postgres.Extensions
                 Depositor = registration.Depositor,
                 IntegrationName = registration.IntegrationName,
                 RegistrationUniqueId = registration.RegistrationUniqueId,
-                TenantId = registration.TenantId,
-                Sequence = registration.Sequence
+                TenantId = registration.TenantId
             };
         }
 
@@ -45,8 +44,7 @@ namespace MarketingBox.Integration.Postgres.Extensions
                 Depositor = registration.Depositor,
                 IntegrationName = registration.IntegrationName,
                 RegistrationUniqueId = registration.RegistrationUniqueId,
-                TenantId = registration.TenantId,
-                Sequence = registration.Sequence
+                TenantId = registration.TenantId
             };
         }
     }

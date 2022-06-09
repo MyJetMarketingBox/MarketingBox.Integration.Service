@@ -36,7 +36,7 @@ namespace MarketingBox.Integration.Service
 
             Settings = SettingsReader.GetSettings<SettingsModel>(SettingsFileName);
 
-            using var loggerFactory = LogConfigurator.ConfigureElk("MarketingBox.Integration.Service",
+            using var loggerFactory = LogConfigurator.ConfigureElk_v2("MarketingBox.Integration.Service",
                 Settings.SeqServiceUrl);
 
             var logger = loggerFactory.CreateLogger<Program>();

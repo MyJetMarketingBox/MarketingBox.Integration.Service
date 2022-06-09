@@ -1,16 +1,16 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using MarketingBox.Integration.Service.Domain.Extensions;
+using MarketingBox.Integration.Service.Domain.Registrations;
 using MarketingBox.Integration.Service.Domain.Repositories;
 using MarketingBox.Integration.Service.Domain.Utils;
 using MarketingBox.Integration.Service.Grpc.Models.Registrations;
 using MarketingBox.Integration.Service.Grpc.Models.Registrations.Contracts.Bridge;
 using MarketingBox.Integration.Service.Storage;
 using MarketingBox.Registration.Service.Grpc;
+using MarketingBox.Registration.Service.Grpc.Requests.Crm;
 using Microsoft.Extensions.Logging;
 using MyJetWallet.Sdk.Service.Tools;
-
 
 namespace MarketingBox.Integration.Service.Services
 {
@@ -86,16 +86,16 @@ namespace MarketingBox.Integration.Service.Services
                         do
                         {
                             var realCrmStatusUpdaters = await bridge.Value.Service.GetRegistrationsPerPeriodAsync(request);
-                            if (realCrmStatusUpdaters.Items == null)
+                            if (realCrmStatusUpdaters.Data == null)
                             {
                                 break;
                             }
                             // Notify only new crm updates
-                            var intersectList = realCrmStatusUpdaters.Items
+                            var intersectList = realCrmStatusUpdaters.Data
                                 .Select(a => a.CustomerId)
                                 .Intersect(potentionalCrmStatusUpdaters.Select(b => b.CustomerId));
 
-                            var updateList = realCrmStatusUpdaters.Items.Where(x => intersectList.Contains(x.CustomerId));
+                            var updateList = realCrmStatusUpdaters.Data.Where(x => intersectList.Contains(x.CustomerId));
 
                             foreach (var updateItem in updateList)
                             {
@@ -113,7 +113,6 @@ namespace MarketingBox.Integration.Service.Services
                                 Console.WriteLine($"Bridge {bridge.Value.IntegrationName} customer '{updateItem.CustomerId}' from {itemFromDb.Crm.ToString()} to {updateItem.Crm.ToString()}");
                                 itemFromDb.CrmUpdatedAt = updateItem.CrmUpdatedAt;
                                 itemFromDb.Crm = updateItem.Crm;
-                                itemFromDb.Sequence++;
                                 await _repository.SaveAsync(itemFromDb);
 
                                 // TODO Add new method for crm update
@@ -122,7 +121,7 @@ namespace MarketingBox.Integration.Service.Services
                                 _logger.LogInformation("New crm status {@Registration}", itemFromDb);
                             }
 
-                            count = realCrmStatusUpdaters.Items.Count;
+                            count = realCrmStatusUpdaters.Data.Count;
                             request.NextPage();
 
                         } while (count == request.PageSize);
@@ -137,18 +136,13 @@ namespace MarketingBox.Integration.Service.Services
             }
         }
 
-        private MarketingBox.Registration.Service.Grpc.Models.Crm.UpdateCrmStatusRequest MapToRequest(
-            MarketingBox.Integration.Service.Domain.Registrations.RegistrationLog message)
+        private UpdateCrmStatusRequest MapToRequest(
+            RegistrationLog message)
         {
-            return new MarketingBox.Registration.Service.Grpc.Models.Crm.UpdateCrmStatusRequest()
+            return new UpdateCrmStatusRequest()
             {
-                CustomerId = message.CustomerId,
-                Crm = message.Crm.MapEnum<Registration.Service.Domain.Crm.CrmStatus>(),  
-                CrmUpdatedAt = message.CrmUpdatedAt,
-                IntegrationId = message.IntegrationId,
-                IntegrationName = message.IntegrationName,
                 RegistrationId = message.RegistrationId,
-                RegistrationUniqueId = message.RegistrationUniqueId,
+                Crm =  message.Crm,
                 TenantId = message.TenantId,
             };
         }
