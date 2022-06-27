@@ -11,7 +11,8 @@ using MarketingBox.Sdk.Common.Enums;
 using MarketingBox.Sdk.Common.Exceptions;
 using MarketingBox.Sdk.Common.Extensions;
 using MarketingBox.Sdk.Common.Models.Grpc;
-using IntegrationRegistration = MarketingBox.Integration.Service.Grpc.Models.Registrations.Contracts.Integration.Registration;
+using IntegrationRegistration =
+    MarketingBox.Integration.Service.Grpc.Models.Registrations.Contracts.Integration.Registration;
 
 namespace MarketingBox.Integration.Service.Services
 {
@@ -23,7 +24,7 @@ namespace MarketingBox.Integration.Service.Services
 
 
         public SendRegistrationsService(ILogger<SendRegistrationsService> logger,
-            BridgeStorage bridgeStorage, 
+            BridgeStorage bridgeStorage,
             IRegistrationsLogRepository repository)
         {
             _logger = logger;
@@ -31,24 +32,25 @@ namespace MarketingBox.Integration.Service.Services
             _repository = repository;
         }
 
-        public async Task<Response<IntegrationRegistration>> SendRegisterationAsync(Grpc.Models.Registrations.Contracts.Integration.RegistrationRequest request)
+        public async Task<Response<IntegrationRegistration>> SendRegisterationAsync(
+            Grpc.Models.Registrations.Contracts.Integration.RegistrationRequest request)
         {
-            _logger.LogInformation("Creating new RegistrationInfo {@context}", request); 
+            _logger.LogInformation("Creating new RegistrationInfo {@context}", request);
             try
             {
-                 var registration =  new Grpc.Models.Registrations.Contracts.Bridge.RegistrationRequest()
+                var registration = new Grpc.Models.Registrations.Contracts.Bridge.RegistrationRequest()
                 {
                     Info = new RegistrationInfo()
-                        { 
-                            Email = request.Info.Email,
-                            Password = request.Info.Password,
-                            Country = request.Info.Country,
-                            FirstName = request.Info.FirstName,
-                            Ip = request.Info.Ip,
-                            Language = LanguageUtils.GetIso2LanguageFromCountryFirstOrDefault(request.Info.Country),
-                            LastName = request.Info.LastName,
-                            Phone = request.Info.Phone
-                        },
+                    {
+                        Email = request.Info.Email,
+                        Password = request.Info.Password,
+                        Country = request.Info.Country,
+                        FirstName = request.Info.FirstName,
+                        Ip = request.Info.Ip,
+                        Language = LanguageUtils.GetIso2LanguageFromCountryFirstOrDefault(request.Info.Country),
+                        LastName = request.Info.LastName,
+                        Phone = request.Info.Phone
+                    },
                     AdditionalInfo = new RegistrationAdditionalInfo()
                     {
                         So = request.AdditionalInfo.So,
@@ -64,7 +66,7 @@ namespace MarketingBox.Integration.Service.Services
                         Sub9 = request.AdditionalInfo.Sub9,
                         Sub10 = request.AdditionalInfo.Sub10,
                     },
-                 };
+                };
 
                 var bridge = _bridgeStorage.Get(request.IntegrationId);
                 if (bridge == null)
@@ -75,6 +77,7 @@ namespace MarketingBox.Integration.Service.Services
 
                 var customerInfo = await bridge.Service.SendRegistrationAsync(registration);
 
+                customerInfo.Process();
                 //Store successfull customers registrations
                 if (customerInfo.Status == ResponseStatus.Ok)
                 {
@@ -96,9 +99,8 @@ namespace MarketingBox.Integration.Service.Services
                         IntegrationName = request.IntegrationName,
                         IntegrationId = request.IntegrationId
                     });
+                    _logger.LogInformation("Created RegistrationInfo {@context}", customerInfo);
                 }
-
-                _logger.LogInformation("Created RegistrationInfo {@context}", customerInfo);
 
                 return new Response<IntegrationRegistration>
                 {
